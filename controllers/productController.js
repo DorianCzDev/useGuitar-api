@@ -1,3 +1,5 @@
+const { StatusCodes } = require("http-status-codes");
+
 const createProduct = async (req, res) => {
   res.send("createProduct");
 };

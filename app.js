@@ -10,7 +10,14 @@ app.use(express.json());
 //routers
 const productRouter = require("./routes/productRoutes");
 
+//error middlewares
+const notFoundMiddleware = require("./middleware/not-found");
+const errorHandlerMiddleware = require("./middleware/error-handler");
+
 app.use("/api/products", productRouter);
+
+app.use(notFoundMiddleware);
+app.use(errorHandlerMiddleware);
 
 const port = process.env.PORT || 5001;
 const start = async () => {
