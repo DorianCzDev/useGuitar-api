@@ -4,18 +4,19 @@ const ProductSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      reguired: [true, "Please provide product name"],
+      required: [true, "Please provide product name"],
       maxlength: [30, "Max length for product name is 30 characters"],
       minlength: 1,
+      lowercase: true,
     },
     category: {
       type: String,
-      reguired: [true, "Please provide product category"],
+      required: [true, "Please provide product category"],
       enum: ["guitar", "amplifier", "accessory"],
     },
     subcategory: {
       type: String,
-      reguired: [true, "Please provide product subcategory"],
+      required: [true, "Please provide product subcategory"],
       enum: [
         "electric guitar",
         "classical guitar",
@@ -47,18 +48,23 @@ const ProductSchema = new mongoose.Schema(
     },
     body: {
       type: String,
+      lowercase: true,
     },
     neck: {
       type: String,
+      lowercase: true,
     },
     bridge_pickup: {
       type: String,
+      lowercase: true,
     },
     middle_pickup: {
       type: String,
+      lowercase: true,
     },
     neck_pickup: {
       type: String,
+      lowercase: true,
     },
     frets_number: {
       type: Number,
@@ -78,6 +84,7 @@ const ProductSchema = new mongoose.Schema(
     },
     speakers: {
       type: String,
+      lowercase: true,
     },
     power: {
       type: Number,
@@ -134,3 +141,5 @@ const ProductSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+module.exports = mongoose.model("Product", ProductSchema);

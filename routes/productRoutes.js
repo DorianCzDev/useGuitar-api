@@ -12,7 +12,7 @@ const {
 router.route("/").post(createProduct).get(getAllProducts);
 
 router
-  .route("/:id")
+  .route("/:name")
   .get(getSingleProduct)
   .patch(updateProduct)
   .delete(deleteProduct);
