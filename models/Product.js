@@ -6,7 +6,8 @@ const ProductSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please provide product name"],
       maxlength: [30, "Max length for product name is 30 characters"],
-      minlength: 1,
+      minlength: 3,
+      maxlength: 30,
       lowercase: true,
     },
     category: {
