@@ -9,6 +9,7 @@ const ProductSchema = new mongoose.Schema(
       minlength: 3,
       maxlength: 30,
       lowercase: true,
+      unique: true,
     },
     category: {
       type: String,
@@ -55,32 +56,32 @@ const ProductSchema = new mongoose.Schema(
       type: String,
       lowercase: true,
     },
-    bridge_pickup: {
+    bridgePickup: {
       type: String,
       lowercase: true,
     },
-    middle_pickup: {
+    middlePickup: {
       type: String,
       lowercase: true,
     },
-    neck_pickup: {
+    neckPickup: {
       type: String,
       lowercase: true,
     },
-    frets_number: {
+    fretsNumber: {
       type: Number,
     },
     lefthaded: {
       type: Boolean,
     },
-    strings_number: {
+    stringsNumber: {
       type: Number,
     },
     pickups: {
       type: String,
       enum: ["H", "HH", "HHH", "S", "SS", "SSS", "HS", "HHS"],
     },
-    pickups_active: {
+    pickupsActive: {
       type: Boolean,
     },
     speakers: {
@@ -93,51 +94,56 @@ const ProductSchema = new mongoose.Schema(
     weight: {
       type: Number,
     },
-    footswitch_connection: {
+    footswitchConnection: {
       type: Boolean,
     },
     channels: {
       type: Number,
     },
-    memory_slots: {
+    memorySlots: {
       type: Number,
     },
-    headphone_output: {
+    headphoneOutput: {
       type: Boolean,
     },
-    effects_processor: {
+    effectsProcessor: {
       type: Boolean,
     },
-    recording_output: {
+    recordingOutput: {
       type: Boolean,
     },
     reverb: {
       type: Boolean,
     },
-    line_input: {
+    lineInput: {
       type: Number,
     },
-    pickup_type: {
+    pickupType: {
       type: String,
       enum: ["humbucker", "single coil"],
     },
-    pickup_strings_number: {
+    pickupStringsNumber: {
       type: Number,
     },
-    aux_port: {
+    auxPort: {
       type: Boolean,
     },
-    usb_port: {
+    usbPort: {
       type: Boolean,
     },
     effects: {
       type: Boolean,
     },
-    amp_modeling: {
+    ampModeling: {
       type: Boolean,
     },
-    drum_computer: {
+    drumComputer: {
       type: Boolean,
+    },
+    user: {
+      type: mongoose.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
   },
   { timestamps: true }

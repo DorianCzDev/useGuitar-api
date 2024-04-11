@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const bcrypt = require("bcrypt");
 
-const UserSchema = mongoose.Schema(
+const UserSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -14,7 +15,7 @@ const UserSchema = mongoose.Schema(
     email: {
       type: String,
       required: [true, "Please provide email"],
-      validator: {
+      validate: {
         validator: validator.isEmail,
         message: "Please provide valid email",
       },
@@ -33,11 +34,12 @@ const UserSchema = mongoose.Schema(
       enum: ["admin", "user"],
       default: "user",
     },
+    isVerified: {
+      type: Boolean,
+      default: true,
+    },
     postal_code: {
       type: String,
-      validator: {
-        validator: validator.isPostalCode,
-      },
     },
     address: {
       type: String,
@@ -49,12 +51,21 @@ const UserSchema = mongoose.Schema(
     },
     phone_number: {
       type: String,
-      validator: {
-        validator: validator.isMobilePhone,
-      },
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
+
+UserSchema.pre("save", async function () {
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+});
+
+UserSchema.methods.comparePassword = async function (password) {
+  const isCorrect = await bcrypt.compare(password, this.password);
+  return isCorrect;
+};
 
 module.exports = mongoose.model("User", UserSchema);

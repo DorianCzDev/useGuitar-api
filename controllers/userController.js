@@ -16,16 +16,6 @@ const getSingleUser = async (req, res) => {
   res.status(StatusCodes.OK).json({ user });
 };
 
-const createUser = async (req, res) => {
-  if (req.body.role) {
-    throw new CustomError.CustomAPIError(
-      `Something went wrong, please try again later`
-    );
-  }
-  const user = await User.create(req.body);
-  res.status(StatusCodes.CREATED).json({ user });
-};
-
 const updateUser = async (req, res) => {
   const { id } = req.params;
   if (req.body.role) {
@@ -53,6 +43,5 @@ module.exports = {
   getAllUsers,
   getSingleUser,
   updateUser,
-  createUser,
   deleteUser,
 };
