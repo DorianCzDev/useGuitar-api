@@ -1,10 +1,49 @@
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors/index");
 const Product = require("../models/Product");
+const cloudinary = require("cloudinary").v2;
 
 const createProduct = async (req, res) => {
-  req.body.user = req.user.userId;
-  const product = await Product.create(req.body);
+  const jsonProduct = JSON.parse(req.body.product);
+  jsonProduct.user = req.user.userId;
+  const product = await Product.create(jsonProduct);
+  if (!product) {
+    throw new CustomError.BadRequestError("Please provide all required values");
+  }
+  if (!req.files.images) {
+    return res.status(StatusCodes.CREATED).json({ product });
+  }
+  const maxSize = 1024 * 1024 * 2;
+  let productImages = [];
+  for (const image of req.files.images) {
+    console.log(image);
+    if (!image.mimetype.startsWith("image")) {
+      throw new CustomError.BadRequestError("Please upload image");
+    }
+    if (image.size > maxSize) {
+      throw new CustomError.BadRequestError(
+        "Please upload image smaller than 2Mb"
+      );
+    }
+    const imageResult = await new Promise((resolve) => {
+      cloudinary.uploader
+        .upload_stream((error, uploadResult) => {
+          if (error) {
+            throw new CustomError.BadRequestError(
+              `Something went wrong with image uploader, here error: ${error}`
+            );
+          }
+          return resolve(uploadResult);
+        })
+        .end(image.data);
+    });
+    productImages = [...productImages, imageResult.secure_url];
+  }
+
+  product.images = productImages;
+  await product.save();
+
+  // console.log(req.files.images[0].data);
   res.status(StatusCodes.CREATED).json({ product });
 };
 

@@ -10,6 +10,7 @@ const ProductSchema = new mongoose.Schema(
       maxlength: 30,
       lowercase: true,
       unique: true,
+      trim: true,
     },
     category: {
       type: String,
@@ -45,8 +46,8 @@ const ProductSchema = new mongoose.Schema(
       default: true,
     },
     images: {
-      type: String,
-      default: "/uploads/example.jpeg",
+      type: Array,
+      default: "/example.png",
     },
     body: {
       type: String,
@@ -139,6 +140,19 @@ const ProductSchema = new mongoose.Schema(
     },
     drumComputer: {
       type: Boolean,
+    },
+    inventory: {
+      type: Number,
+      required: true,
+      default: 10,
+    },
+    averageRating: {
+      type: Number,
+      default: 0,
+    },
+    numOfReviews: {
+      type: Number,
+      default: 0,
     },
     user: {
       type: mongoose.Types.ObjectId,

@@ -1,7 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors/index");
 const User = require("../models/User");
-const { createJWT, cookieResponse } = require("../utils/jwt");
+const { cookieResponse } = require("../utils/jwt");
 const Token = require("../models/Token");
 const crypto = require("crypto");
 
@@ -33,8 +33,8 @@ const login = async (req, res) => {
 
   let refreshToken = "";
   const existingToken = await Token.findOne({ user: userId });
+  const tokenUser = { name, role, userId };
   if (existingToken) {
-    const tokenUser = { name, role, userId };
     const { isValid } = existingToken;
     if (!isValid) {
       throw new CustomError.UnauthenticatedError("Invalid Crudentials");
@@ -47,12 +47,25 @@ const login = async (req, res) => {
   refreshToken = crypto.randomBytes(40).toString("hex");
   const userAgent = req.headers["user-agent"];
   const ip = req.ip;
-  const tokenUser = { refreshToken, ip, userAgent, user: userId };
+  const token = { refreshToken, ip, userAgent, user: userId };
 
-  await Token.create(tokenUser);
-  cookieResponse({ res, user: tokenUser, refreshToken });
+  await Token.create(token);
+  cookieResponse({ res, user: token, refreshToken });
 
   res.status(StatusCodes.OK).json({ user: tokenUser });
 };
 
-module.exports = { login, register };
+const logout = async (req, res) => {
+  await Token.findOneAndDelete({ user: req.user.userId });
+  res.cookie("accessToken", "logout", {
+    httpOnly: true,
+    expires: new Date(Date.now()),
+  });
+  res.cookie("refreshToken", "logout", {
+    httpOnly: true,
+    expires: new Date(Date.now()),
+  });
+  res.status(StatusCodes.OK).json({ msg: "gówno" });
+};
+
+module.exports = { login, register, logout };

@@ -39,9 +39,14 @@ const deleteUser = async (req, res) => {
   res.status(StatusCodes.OK).json({ msg: "User successfull deleted" });
 };
 
+const getCurrentUser = async (req, res) => {
+  res.status(StatusCodes.OK).json(req.user);
+};
+
 module.exports = {
   getAllUsers,
   getSingleUser,
   updateUser,
   deleteUser,
+  getCurrentUser,
 };
