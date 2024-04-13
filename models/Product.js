@@ -1,5 +1,15 @@
 const mongoose = require("mongoose");
 
+const ImageSchema = new mongoose.Schema({
+  imageId: {
+    type: String,
+  },
+  imageURL: {
+    type: String,
+    default: "/example.png",
+  },
+});
+
 const ProductSchema = new mongoose.Schema(
   {
     name: {
@@ -7,7 +17,7 @@ const ProductSchema = new mongoose.Schema(
       required: [true, "Please provide product name"],
       maxlength: [30, "Max length for product name is 30 characters"],
       minlength: 3,
-      maxlength: 30,
+      maxlength: 40,
       lowercase: true,
       unique: true,
       trim: true,
@@ -45,10 +55,7 @@ const ProductSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    images: {
-      type: Array,
-      default: "/example.png",
-    },
+    images: [ImageSchema],
     body: {
       type: String,
       lowercase: true,

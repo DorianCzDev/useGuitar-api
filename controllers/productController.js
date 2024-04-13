@@ -10,40 +10,59 @@ const createProduct = async (req, res) => {
   if (!product) {
     throw new CustomError.BadRequestError("Please provide all required values");
   }
-  if (!req.files.images) {
+  if (!req.files?.images) {
     return res.status(StatusCodes.CREATED).json({ product });
   }
   const maxSize = 1024 * 1024 * 2;
   let productImages = [];
-  for (const image of req.files.images) {
-    console.log(image);
-    if (!image.mimetype.startsWith("image")) {
-      throw new CustomError.BadRequestError("Please upload image");
+  if (req.files.images.length > 1) {
+    for (const image of req.files.images) {
+      if (!image.mimetype.startsWith("image")) {
+        throw new CustomError.BadRequestError("Please upload image");
+      }
+      if (image.size > maxSize) {
+        throw new CustomError.BadRequestError(
+          "Please upload image smaller than 2Mb"
+        );
+      }
+      const imageResult = await new Promise((resolve) => {
+        cloudinary.uploader
+          .upload_stream((error, uploadResult) => {
+            if (error) {
+              throw new CustomError.BadRequestError(
+                `Something went wrong with image uploader ${error}`
+              );
+            }
+            return resolve(uploadResult);
+          })
+          .end(image.data);
+      });
+      productImages = [
+        ...productImages,
+        { imageId: imageResult.public_id, imageURL: imageResult.secure_url },
+      ];
     }
-    if (image.size > maxSize) {
-      throw new CustomError.BadRequestError(
-        "Please upload image smaller than 2Mb"
-      );
-    }
+  } else if (!req.files.images.length) {
     const imageResult = await new Promise((resolve) => {
       cloudinary.uploader
         .upload_stream((error, uploadResult) => {
           if (error) {
             throw new CustomError.BadRequestError(
-              `Something went wrong with image uploader, here error: ${error}`
+              `Something went wrong with image uploader ${error}`
             );
           }
           return resolve(uploadResult);
         })
-        .end(image.data);
+        .end(req.files.images.data);
     });
-    productImages = [...productImages, imageResult.secure_url];
+    productImages = {
+      imageId: imageResult.public_id,
+      imageURL: imageResult.secure_url,
+    };
   }
-
   product.images = productImages;
   await product.save();
 
-  // console.log(req.files.images[0].data);
   res.status(StatusCodes.CREATED).json({ product });
 };
 
