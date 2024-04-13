@@ -7,6 +7,7 @@ const {
   getSingleProduct,
   updateProduct,
   deleteProduct,
+  deleteProductImage,
 } = require("../controllers/productController");
 const {
   authenticateUser,
@@ -17,6 +18,10 @@ router
   .route("/")
   .post(authenticateUser, permission("admin"), createProduct)
   .get(getAllProducts);
+
+router
+  .route("/deleteImage/:name")
+  .delete(authenticateUser, permission("admin"), deleteProductImage);
 
 router
   .route("/:name")

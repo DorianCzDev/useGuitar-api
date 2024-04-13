@@ -104,10 +104,36 @@ const deleteProduct = async (req, res) => {
   res.status(StatusCodes.OK).json({ product });
 };
 
+const deleteProductImage = async (req, res) => {
+  const { name } = req.params;
+  const { publicId } = req.query;
+  if (!publicId) {
+    throw new CustomError.BadRequestError("Please provide required query");
+  }
+  const product = await Product.findOne({ name });
+  if (!product) {
+    throw new CustomError.BadRequestError(`No product with id: ${id}`);
+  }
+  let imageIndex;
+  for (const [index, image] of product.images.entries()) {
+    if (image.imageId === publicId) imageIndex = index;
+  }
+  if (imageIndex === -1 || imageIndex === undefined) {
+    throw new CustomError.BadRequestError(`No image with publicId ${publicId}`);
+  }
+  product.images.splice(imageIndex, 1);
+  await product.save();
+
+  await cloudinary.uploader.destroy(publicId);
+
+  res.status(StatusCodes.OK).json({ product });
+};
+
 module.exports = {
   createProduct,
   getAllProducts,
   getSingleProduct,
   updateProduct,
   deleteProduct,
+  deleteProductImage,
 };
