@@ -138,6 +138,12 @@ const deleteProduct = async (req, res) => {
     throw new CustomError.NotFoundError(`No product with name: ${name}`);
   }
 
+  if (product.images) {
+    for (const image of product.images) {
+      await cloudinary.uploader.destroy(image.imageId);
+    }
+  }
+
   res.status(StatusCodes.OK).json({ product });
 };
 

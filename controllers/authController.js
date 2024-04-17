@@ -51,7 +51,7 @@ const login = async (req, res) => {
   const token = { refreshToken, ip, userAgent, user: userId };
 
   await Token.create(token);
-  cookieResponse({ res, user: token, refreshToken });
+  cookieResponse({ res, user: tokenUser, refreshToken });
 
   res.status(StatusCodes.OK).json({ user: tokenUser });
 };
