@@ -12,6 +12,10 @@ const { authenticateUser } = require("../middleware/authentication");
 
 router.route("/").get(getAllUsers);
 router.route("/getCurrentUser").get(authenticateUser, getCurrentUser);
-router.route("/:id").get(getSingleUser).patch(updateUser).delete(deleteUser);
+router
+  .route("/:id")
+  .get(authenticateUser, getSingleUser)
+  .patch(authenticateUser, updateUser)
+  .delete(authenticateUser, deleteUser);
 
 module.exports = router;

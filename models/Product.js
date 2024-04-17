@@ -55,6 +55,15 @@ const ProductSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    description: {
+      type: String,
+      required: [true, "Please provide product description"],
+      maxlength: [1000, "Description can not be more than 1000 characters"],
+    },
+    featured: {
+      type: Boolean,
+      default: false,
+    },
     images: [ImageSchema],
     body: {
       type: String,
@@ -167,7 +176,14 @@ const ProductSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
+
+ProductSchema.virtual("reviews", {
+  ref: "Review",
+  localField: "_id",
+  foreignField: "product",
+  justOne: false,
+});
 
 module.exports = mongoose.model("Product", ProductSchema);

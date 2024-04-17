@@ -63,7 +63,10 @@ const getAllProducts = async (req, res) => {
 const getSingleProduct = async (req, res) => {
   let { name } = req.params;
   name = name.replaceAll("_", " ");
-  const product = await Product.findOne({ name });
+  const product = await Product.findOne({ name }).populate({
+    path: "reviews",
+    select: "comment user rating",
+  });
   if (!product) {
     throw new CustomError.NotFoundError(`No product with name: ${name}`);
   }
@@ -146,14 +149,14 @@ const deleteProductImage = async (req, res) => {
   }
   const product = await Product.findOne({ name });
   if (!product) {
-    throw new CustomError.BadRequestError(`No product with id: ${id}`);
+    throw new CustomError.NotFoundError(`No product with id: ${id}`);
   }
   let imageIndex;
   for (const [index, image] of product.images.entries()) {
     if (image.imageId === publicId) imageIndex = index;
   }
   if (imageIndex === -1 || imageIndex === undefined) {
-    throw new CustomError.BadRequestError(`No image with publicId ${publicId}`);
+    throw new CustomError.NotFoundError(`No image with publicId ${publicId}`);
   }
   product.images.splice(imageIndex, 1);
   await product.save();

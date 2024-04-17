@@ -15,6 +15,7 @@ const register = async (req, res) => {
   const user = await User.create(req.body);
   res.status(StatusCodes.CREATED).json({ user });
 };
+
 const login = async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
@@ -65,7 +66,7 @@ const logout = async (req, res) => {
     httpOnly: true,
     expires: new Date(Date.now()),
   });
-  res.status(StatusCodes.OK).json({ msg: "gówno" });
+  res.status(StatusCodes.OK).json({ msg: "You logged out" });
 };
 
 module.exports = { login, register, logout };
