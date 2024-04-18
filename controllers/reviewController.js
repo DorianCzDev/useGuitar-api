@@ -43,7 +43,6 @@ const createReview = async (req, res) => {
     );
   }
   req.body.user = req.user.userId;
-  console.log(req.signedCookies);
 
   const review = await Review.create(req.body);
 
@@ -62,6 +61,9 @@ const updateReview = async (req, res) => {
   const { id } = req.params;
 
   const review = await Review.findOne({ _id: id });
+  if (!review) {
+    throw new CustomError.NotFoundError(`No review with id: ${id}`);
+  }
   review.comment = req.body.comment;
   review.rating = req.body.rating;
   checkPermission(req.user, review.user);

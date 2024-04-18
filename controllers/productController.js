@@ -155,14 +155,18 @@ const deleteProductImage = async (req, res) => {
   }
   const product = await Product.findOne({ name });
   if (!product) {
-    throw new CustomError.NotFoundError(`No product with id: ${id}`);
+    throw new CustomError.NotFoundError(
+      `No image with publicId: ${publicId} related to product: ${name}`
+    );
   }
   let imageIndex;
   for (const [index, image] of product.images.entries()) {
     if (image.imageId === publicId) imageIndex = index;
   }
   if (imageIndex === -1 || imageIndex === undefined) {
-    throw new CustomError.NotFoundError(`No image with publicId ${publicId}`);
+    throw new CustomError.NotFoundError(
+      `No image with publicId: ${publicId} related to product: ${name}`
+    );
   }
   product.images.splice(imageIndex, 1);
   await product.save();

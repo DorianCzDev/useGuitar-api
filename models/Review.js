@@ -34,21 +34,22 @@ ReviewSchema.statics.calculateAvarageRating = async function (productId) {
     {
       $group: {
         _id: "$product",
-        avarageRating: { $avg: "$rating" },
+        averageRating: { $avg: "$rating" },
         numOfReviews: { $sum: 1 },
       },
     },
   ]);
+
   try {
     await this.model("Product").findOneAndUpdate(
       { _id: productId },
       {
-        avarageRating: Math.ceil(result[0]?.avarageRating || 0),
+        averageRating: Math.ceil(result[0]?.averageRating || 0),
         numOfReviews: result[0]?.numOfReviews || 0,
       }
     );
-  } catch (err) {
-    console.log(err);
+  } catch (error) {
+    console.log(error);
   }
 };
 

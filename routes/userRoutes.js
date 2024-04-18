@@ -8,14 +8,17 @@ const {
   deleteUser,
   getCurrentUser,
 } = require("../controllers/userController");
-const { authenticateUser } = require("../middleware/authentication");
+const {
+  authenticateUser,
+  permission,
+} = require("../middleware/authentication");
 
-router.route("/").get(getAllUsers);
+router.route("/").get(authenticateUser, permission("admin"), getAllUsers);
 router.route("/getCurrentUser").get(authenticateUser, getCurrentUser);
 router
   .route("/:id")
   .get(authenticateUser, getSingleUser)
-  .patch(authenticateUser, updateUser)
-  .delete(authenticateUser, deleteUser);
+  .patch(authenticateUser, permission("admin"), updateUser)
+  .delete(authenticateUser, permission("admin"), deleteUser);
 
 module.exports = router;
