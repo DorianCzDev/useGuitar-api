@@ -5,19 +5,24 @@ const { createCloudinaryImage } = require("../utils/createCloudinaryImage");
 const cloudinary = require("cloudinary").v2;
 
 const createProduct = async (req, res) => {
-  const jsonProduct = JSON.parse(req.body.product);
-  jsonProduct.user = req.user.userId;
-  const product = await Product.create(jsonProduct);
+  let result = {};
+  for (const key in req.body) {
+    if (req.body[key] !== null && req.body[key] !== "") {
+      result[key] = req.body[key];
+    }
+  }
+  result.user = req.user.userId;
+  const product = await Product.create(result);
   if (!product) {
     throw new CustomError.BadRequestError("Please provide all required values");
   }
-  if (!req.files?.images) {
+  if (!req.files) {
     return res.status(StatusCodes.CREATED).json({ product });
   }
   const maxSize = 1024 * 1024 * 2; //2Mb
   let productImages = [];
-  if (req.files.images.length > 1) {
-    for (const image of req.files.images) {
+  if (req.files.length > 1) {
+    for (const image of req.files) {
       if (!image.mimetype.startsWith("image")) {
         throw new CustomError.BadRequestError("Please upload image");
       }
@@ -26,23 +31,23 @@ const createProduct = async (req, res) => {
           "Please upload image smaller than 2Mb"
         );
       }
-      const imageResult = await createCloudinaryImage(image.data);
+      const imageResult = await createCloudinaryImage(image.buffer);
 
       productImages = [
         ...productImages,
         { imageId: imageResult.public_id, imageURL: imageResult.secure_url },
       ];
     }
-  } else if (!req.files.images.length) {
-    if (!req.files.images.mimetype.startsWith("image")) {
+  } else if (req.files.length === 1) {
+    if (!req.files[0].mimetype.startsWith("image")) {
       throw new CustomError.BadRequestError("Please upload image");
     }
-    if (req.files.images.size > maxSize) {
+    if (req.files[0].size > maxSize) {
       throw new CustomError.BadRequestError(
         "Please upload image smaller than 2Mb"
       );
     }
-    const imageResult = await createCloudinaryImage(req.files.images.data);
+    const imageResult = await createCloudinaryImage(req.files[0].buffer);
 
     productImages = {
       imageId: imageResult.public_id,
@@ -56,13 +61,23 @@ const createProduct = async (req, res) => {
 };
 
 const getAllProducts = async (req, res) => {
-  const products = await Product.find({});
-  res.status(StatusCodes.OK).json({ count: products.length, products });
+  const { sortBy } = req.query;
+  let result = Product.find({}).select(
+    "-description -category -bridgePickup -updatedAt -neckPickup -middlePickup -user"
+  );
+
+  if (sortBy) {
+    result = result.sort(sortBy);
+  } else {
+    result = result.sort("createdAt");
+  }
+  const products = await result;
+  res.status(StatusCodes.OK).json({ products });
 };
 
 const getSingleProduct = async (req, res) => {
   let { name } = req.params;
-  name = name.replaceAll("_", " ");
+  // name = name.replaceAll("_", " ");
   const product = await Product.findOne({ name }).populate({
     path: "reviews",
     select: "comment user rating",
@@ -75,24 +90,29 @@ const getSingleProduct = async (req, res) => {
 };
 
 const updateProduct = async (req, res) => {
-  let { name } = req.params;
-  name = name.replaceAll("_", " ");
-  const jsonProduct = JSON.parse(req.body.product);
-  let product = await Product.findOne({ name });
-  product = Object.assign(product, jsonProduct);
-  if (!product) {
-    throw new CustomError.NotFoundError(`No product with name: ${name}`);
+  const { name } = req.params;
+  let result = {};
+  for (const key in req.body) {
+    if (req.body[key] !== null && req.body[key] !== "") {
+      result[key] = req.body[key];
+    }
   }
-  if (!req.files?.images) {
+  // name = name.replaceAll("_", " ");
+  let product = await Product.findOne({ name });
+  product = Object.assign(product, result);
+  if (!product) {
+    throw new CustomError.NotFoundError(`No product with name: ${result}`);
+  }
+  if (!req.files) {
     await product.save();
-    return res.status(StatusCodes.CREATED).json({ product });
+    return res.status(StatusCodes.OK).json({ product });
   }
   const maxSize = 1024 * 1024 * 2; //2Mb
   let productImages = [];
-  if (req.files?.images) {
+  if (req.files) {
     productImages = product.images ? product.images : [];
-    if (req.files.images.length > 1) {
-      for (const image of req.files.images) {
+    if (req.files.length > 1) {
+      for (const image of req.files) {
         if (!image.mimetype.startsWith("image")) {
           throw new CustomError.BadRequestError("Please upload image");
         }
@@ -101,23 +121,23 @@ const updateProduct = async (req, res) => {
             "Please upload image smaller than 2Mb"
           );
         }
-        const imageResult = await createCloudinaryImage(image.data);
+        const imageResult = await createCloudinaryImage(image.buffer);
 
         productImages = [
           ...productImages,
           { imageId: imageResult.public_id, imageURL: imageResult.secure_url },
         ];
       }
-    } else if (!req.files.images.length) {
-      if (!req.files.images.mimetype.startsWith("image")) {
+    } else if (req.files.length === 1) {
+      if (!req.files[0].mimetype.startsWith("image")) {
         throw new CustomError.BadRequestError("Please upload image");
       }
-      if (req.files.images.size > maxSize) {
+      if (req.files[0].size > maxSize) {
         throw new CustomError.BadRequestError(
           "Please upload image smaller than 2Mb"
         );
       }
-      const imageResult = await createCloudinaryImage(req.files.images.data);
+      const imageResult = await createCloudinaryImage(req.files[0].buffer);
 
       productImages = [
         ...productImages,

@@ -5,13 +5,15 @@ const express = require("express");
 const app = express();
 
 const cookieParser = require("cookie-parser");
-const fileUpload = require("express-fileupload");
+
 const cloudinary = require("cloudinary").v2;
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
   api_secret: process.env.CLOUD_API_SECRET,
 });
+const { addCookieAccessHeaders } = require("./middleware/headers");
+const cors = require("cors");
 
 const morgan = require("morgan");
 
@@ -19,9 +21,9 @@ const connectDB = require("./db/connect");
 
 app.use(morgan("tiny"));
 app.use(express.json());
-app.use(fileUpload());
 app.use(cookieParser(process.env.JWT_SECRET));
-
+app.use(cors({ origin: true, credentials: true }));
+app.use(addCookieAccessHeaders);
 //routers
 const productRouter = require("./routes/productRoutes");
 const userRouter = require("./routes/userRoutes");

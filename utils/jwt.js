@@ -13,19 +13,20 @@ const cookieResponse = ({ res, user, refreshToken }) => {
 
   const accessExp = 1000 * 60 * 60 * 24;
   const refreshExp = 1000 * 60 * 60 * 24 * 30;
-
   res.cookie("accessToken", accessTokenJWT, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: true,
     signed: true,
     expires: new Date(Date.now() + accessExp),
+    sameSite: "none",
   });
 
   res.cookie("refreshToken", refreshTokenJWT, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: true,
     signed: true,
     expires: new Date(Date.now() + refreshExp),
+    sameSite: "none",
   });
 };
 

@@ -11,7 +11,6 @@ const register = async (req, res) => {
       "Something went wrong, please try again later"
     );
   }
-
   const user = await User.create(req.body);
   res.status(StatusCodes.CREATED).json({ user });
 };
@@ -42,7 +41,7 @@ const login = async (req, res) => {
     }
     refreshToken = existingToken.refreshToken;
     cookieResponse({ res, user: tokenUser, refreshToken });
-    res.status(StatusCodes.OK).json({ user: tokenUser });
+    res.status(StatusCodes.OK).json({ msg: "You logged in" });
     return;
   }
   refreshToken = crypto.randomBytes(40).toString("hex");
@@ -53,7 +52,7 @@ const login = async (req, res) => {
   await Token.create(token);
   cookieResponse({ res, user: tokenUser, refreshToken });
 
-  res.status(StatusCodes.OK).json({ user: tokenUser });
+  res.status(StatusCodes.OK).json({ msg: "You logged in" });
 };
 
 const logout = async (req, res) => {

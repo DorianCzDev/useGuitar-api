@@ -25,7 +25,7 @@ const ProductSchema = new mongoose.Schema(
     category: {
       type: String,
       required: [true, "Please provide product category"],
-      enum: ["guitar", "amplifier", "accessory"],
+      enum: ["guitar", "amplifier", "pickup", "multi effect"],
     },
     subcategory: {
       type: String,
@@ -38,27 +38,20 @@ const ProductSchema = new mongoose.Schema(
         "electric guitar amp",
         "bass guitar amp",
         "acoustic guitar amp",
-        "bass pickup",
+        "bass guitar pickup",
         "electric guitar pickup",
-        "acoustic guitar strings",
-        "electric guitar strings",
-        "classical guitar strings",
-        "bass guitar strings",
         "guitar multi effect",
+        "bass multi effect",
       ],
     },
     price: {
       type: Number,
       required: [true, "Please provide product price"],
     },
-    available: {
-      type: Boolean,
-      default: true,
-    },
     description: {
       type: String,
       required: [true, "Please provide product description"],
-      maxlength: [1000, "Description can not be more than 1000 characters"],
+      maxlength: [1600, "Description can not be more than 1600 characters"],
     },
     featured: {
       type: Boolean,
@@ -88,7 +81,7 @@ const ProductSchema = new mongoose.Schema(
     fretsNumber: {
       type: Number,
     },
-    lefthaded: {
+    lefthanded: {
       type: Boolean,
     },
     stringsNumber: {
@@ -98,8 +91,15 @@ const ProductSchema = new mongoose.Schema(
       type: String,
       enum: ["H", "HH", "HHH", "S", "SS", "SSS", "HS", "HHS"],
     },
+    tremolo: {
+      type: Boolean,
+    },
     pickupsActive: {
       type: Boolean,
+    },
+    pickupType: {
+      type: String,
+      enum: ["humbucker", "single coil", "mixed"],
     },
     speakers: {
       type: String,
@@ -111,8 +111,9 @@ const ProductSchema = new mongoose.Schema(
     weight: {
       type: Number,
     },
-    footswitchConnection: {
+    footSwitchConnection: {
       type: Boolean,
+      default: false,
     },
     channels: {
       type: Number,
@@ -122,40 +123,65 @@ const ProductSchema = new mongoose.Schema(
     },
     headphoneOutput: {
       type: Boolean,
+      default: false,
     },
     effectsProcessor: {
       type: Boolean,
+      default: false,
     },
     recordingOutput: {
       type: Boolean,
+      default: false,
     },
     reverb: {
       type: Boolean,
+      default: false,
     },
     lineInput: {
       type: Number,
-    },
-    pickupType: {
-      type: String,
-      enum: ["humbucker", "single coil"],
+      default: false,
     },
     pickupStringsNumber: {
       type: Number,
     },
+    active: {
+      type: Boolean,
+      default: false,
+    },
+    output: {
+      type: String,
+      enum: ["high", "medium", "low"],
+    },
+    kappe: {
+      type: Boolean,
+      default: false,
+    },
+    wiring: {
+      type: Number,
+    },
+    pickup: {
+      type: String,
+      enum: ["humbucker", "single coil"],
+    },
     auxPort: {
       type: Boolean,
+      default: false,
     },
     usbPort: {
       type: Boolean,
+      default: false,
     },
     effects: {
       type: Boolean,
+      default: false,
     },
     ampModeling: {
       type: Boolean,
+      default: false,
     },
     drumComputer: {
       type: Boolean,
+      default: false,
     },
     inventory: {
       type: Number,

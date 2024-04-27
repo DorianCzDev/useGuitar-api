@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
 
+const multer = require("multer");
+const upload = multer();
+
 const {
   createProduct,
   getAllProducts,
@@ -16,7 +19,7 @@ const {
 
 router
   .route("/")
-  .post(authenticateUser, permission("admin"), createProduct)
+  .post(authenticateUser, permission("admin"), upload.any(), createProduct)
   .get(getAllProducts);
 
 router
@@ -26,7 +29,7 @@ router
 router
   .route("/:name")
   .get(getSingleProduct)
-  .patch(authenticateUser, permission("admin"), updateProduct)
+  .patch(authenticateUser, permission("admin"), upload.any(), updateProduct)
   .delete(authenticateUser, permission("admin"), deleteProduct);
 
 module.exports = router;
