@@ -30,7 +30,7 @@ const updateUser = async (req, res) => {
   user.password = req.body.password;
 
   await user.save();
-  res.status(StatusCodes.OK).json({ user });
+  res.status(StatusCodes.OK).json({ msg: "User successfully updated" });
 };
 
 const deleteUser = async (req, res) => {
@@ -39,7 +39,7 @@ const deleteUser = async (req, res) => {
   if (!user) {
     throw new CustomError.NotFoundError(`No user with id: ${id}`);
   }
-  res.status(StatusCodes.OK).json({ msg: "User successfull deleted" });
+  res.status(StatusCodes.OK).json({ msg: "User successfully deleted" });
 };
 
 const getCurrentUser = async (req, res) => {

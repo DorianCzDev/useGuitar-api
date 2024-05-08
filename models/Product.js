@@ -60,23 +60,18 @@ const ProductSchema = new mongoose.Schema(
     images: [ImageSchema],
     body: {
       type: String,
-      lowercase: true,
     },
     neck: {
       type: String,
-      lowercase: true,
     },
     bridgePickup: {
       type: String,
-      lowercase: true,
     },
     middlePickup: {
       type: String,
-      lowercase: true,
     },
     neckPickup: {
       type: String,
-      lowercase: true,
     },
     fretsNumber: {
       type: Number,
@@ -103,7 +98,6 @@ const ProductSchema = new mongoose.Schema(
     },
     speakers: {
       type: String,
-      lowercase: true,
     },
     power: {
       type: Number,
@@ -113,7 +107,6 @@ const ProductSchema = new mongoose.Schema(
     },
     footSwitchConnection: {
       type: Boolean,
-      default: false,
     },
     channels: {
       type: Number,
@@ -123,30 +116,25 @@ const ProductSchema = new mongoose.Schema(
     },
     headphoneOutput: {
       type: Boolean,
-      default: false,
     },
     effectsProcessor: {
       type: Boolean,
-      default: false,
     },
     recordingOutput: {
       type: Boolean,
-      default: false,
     },
     reverb: {
       type: Boolean,
-      default: false,
     },
     lineInput: {
       type: Number,
-      default: false,
     },
+
     pickupStringsNumber: {
       type: Number,
     },
     active: {
       type: Boolean,
-      default: false,
     },
     output: {
       type: String,
@@ -154,7 +142,6 @@ const ProductSchema = new mongoose.Schema(
     },
     kappe: {
       type: Boolean,
-      default: false,
     },
     wiring: {
       type: Number,
@@ -163,26 +150,25 @@ const ProductSchema = new mongoose.Schema(
       type: String,
       enum: ["humbucker", "single coil"],
     },
+
+
     auxPort: {
       type: Boolean,
-      default: false,
     },
     usbPort: {
       type: Boolean,
-      default: false,
     },
     effects: {
       type: Boolean,
-      default: false,
     },
     ampModeling: {
       type: Boolean,
-      default: false,
     },
     drumComputer: {
       type: Boolean,
-      default: false,
     },
+
+    
     inventory: {
       type: Number,
       required: true,

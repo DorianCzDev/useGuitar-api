@@ -82,77 +82,39 @@ const getAllProducts = async (req, res) => {
 
 const getSpecificProducts = async (req, res) => {
   const { category } = req.params;
+  const { sortBy, name, subcategory } = req.query;
+  let queryObject = {};
 
-  let queryEntries = Object.entries(req.query);
-
-  let queryArray = [];
-  let queryFilters = [];
-
-  queryEntries.map((arrayEl) => {
-    if (arrayEl[0].includes("min") || arrayEl[0].includes("max")) {
-      queryFilters = [...queryFilters, [arrayEl[0], arrayEl[1]]];
-    } else {
-      queryArray = [...queryArray, [arrayEl[0], arrayEl[1]]];
-    }
-  });
-
-  let queryFiltersArray = [];
-  queryFilters.map((arrayEl) => {
-    const value = arrayEl[1];
-    let items = [];
-    if (arrayEl[0].includes("-")) {
-      items = arrayEl[0].split("-");
-    }
-    const [operator, field] = items;
-
-    queryFiltersArray = [...queryFiltersArray, [operator, field, value]];
-  });
-
-  let filtersObject = {};
-
-  queryFiltersArray.map((arrayEl) => {
-    let isFirtsTimeField = true;
-    let [operator, field, value] = arrayEl;
-    if (operator === "max") {
-      operator = "$lte";
-    } else if (operator === "min") {
-      operator = "$gte";
-    }
-    const keys = Object.keys(filtersObject);
-    let objectEl;
-    keys.map((key) => {
-      if (key === field) {
-        filtersObject[key] = {
-          ...filtersObject[key],
-          [operator]: Number(value),
-        };
-        isFirtsTimeField = false;
-      }
-    });
-    if (keys.length === 0 || isFirtsTimeField) {
-      objectEl = {
-        [field]: {
-          [operator]: Number(value),
-        },
-      };
-      filtersObject = { ...filtersObject, ...objectEl };
-    }
-  });
-
-  const queryObjectFromArray = Object.fromEntries(queryArray);
-
-  let queryObject = { ...queryObjectFromArray, ...filtersObject, category };
-
-  if (queryObject.name) {
-    queryObject.name = { $regex: queryObject.name, $options: "i" };
+  if (category) {
+    queryObject.category = category;
   }
+  if (subcategory) {
+    queryObject.subcategory = subcategory;
+  }
+  if (name) {
+    queryObject.name = { $regex: name, $options: "i" };
+  }
+
+  // if (category) {
+  //   queryObject.category = category;
+  // }
+  // if (subcategory) {
+  //   queryObject.subcategory = subcategory;
+  // }
+  // if (name) {
+  //   queryObject.name = { $regex: name, $options: "i" };
+  // }
+
+  let testQueryObject = { ...req.query, category };
+
+  console.log(testQueryObject);
 
   let result = Product.find(queryObject).select(
     "-description -updatedAt  -user"
   );
 
-  if (queryObject.sortBy) {
-    result = result.sort(queryObject.sortBy);
+  if (sortBy) {
+    result = result.sort(sortBy);
   } else {
     result = result.sort("createdAt");
   }

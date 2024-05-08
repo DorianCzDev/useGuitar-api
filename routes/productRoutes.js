@@ -11,6 +11,7 @@ const {
   updateProduct,
   deleteProduct,
   deleteProductImage,
+  getSpecificProducts,
 } = require("../controllers/productController");
 const {
   authenticateUser,
@@ -21,6 +22,8 @@ router
   .route("/")
   .post(authenticateUser, permission("admin"), upload.any(), createProduct)
   .get(getAllProducts);
+
+router.route("/category/:category").get(getSpecificProducts);
 
 router
   .route("/deleteImage/:name")
