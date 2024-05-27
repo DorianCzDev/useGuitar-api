@@ -12,6 +12,7 @@ const {
   deleteProduct,
   deleteProductImage,
   getSpecificProducts,
+  getProductsFromCart,
 } = require("../controllers/productController");
 const {
   authenticateUser,
@@ -24,7 +25,7 @@ router
   .get(getAllProducts);
 
 router.route("/category/:category").get(getSpecificProducts);
-
+router.route("/getMyCart/:id").get(getProductsFromCart);
 router
   .route("/deleteImage/:name")
   .delete(authenticateUser, permission("admin"), deleteProductImage);

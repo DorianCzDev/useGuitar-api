@@ -41,7 +41,7 @@ const login = async (req, res) => {
     }
     refreshToken = existingToken.refreshToken;
     cookieResponse({ res, user: tokenUser, refreshToken });
-    res.status(StatusCodes.OK).json({ msg: "You logged in" });
+    res.status(StatusCodes.OK).json({ name, email });
     return;
   }
   refreshToken = crypto.randomBytes(40).toString("hex");
@@ -52,7 +52,7 @@ const login = async (req, res) => {
   await Token.create(token);
   cookieResponse({ res, user: tokenUser, refreshToken });
 
-  res.status(StatusCodes.OK).json({ msg: "You logged in" });
+  res.status(StatusCodes.OK).json({ name, email });
 };
 
 const logout = async (req, res) => {

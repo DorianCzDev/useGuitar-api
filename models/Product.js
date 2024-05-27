@@ -151,7 +151,6 @@ const ProductSchema = new mongoose.Schema(
       enum: ["humbucker", "single coil"],
     },
 
-
     auxPort: {
       type: Boolean,
     },
@@ -167,13 +166,12 @@ const ProductSchema = new mongoose.Schema(
     drumComputer: {
       type: Boolean,
     },
-
-    
     inventory: {
       type: Number,
       required: true,
       default: 10,
     },
+
     averageRating: {
       type: Number,
       default: 0,

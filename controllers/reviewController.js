@@ -24,7 +24,7 @@ const getUserReviews = async (req, res) => {
 };
 
 const createReview = async (req, res) => {
-  const { product: productId } = req.body;
+  const { id: productId } = req.params;
 
   const product = await Product.findOne({ _id: productId });
 
@@ -43,11 +43,13 @@ const createReview = async (req, res) => {
     );
   }
   req.body.user = req.user.userId;
+  req.body.product = productId;
 
   const review = await Review.create(req.body);
 
   res.status(StatusCodes.CREATED).json({ review });
 };
+
 const deleteReview = async (req, res) => {
   const { id } = req.params;
   const review = await Review.findOneAndDelete({ _id: id });

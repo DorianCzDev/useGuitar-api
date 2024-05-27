@@ -12,7 +12,7 @@ const {
 } = require("../middleware/authentication");
 const router = express.Router();
 
-router.route("/").post(authenticateUser, createReview);
+router.route("/product/:id").post(authenticateUser, createReview);
 router.route("/user/:id").get(authenticateUser, getUserReviews);
 router.route("/product/:id").get(getSingleProductReviews);
 router

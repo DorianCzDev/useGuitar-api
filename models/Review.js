@@ -5,12 +5,17 @@ const ReviewSchema = new mongoose.Schema(
     comment: {
       type: String,
       required: [true, "Please provide comment to review"],
+      maxlength: [1000, "Review can not be more than 1000 characters"],
     },
     rating: {
       type: Number,
       min: 1,
       max: 5,
       required: [true, "Please provide rating"],
+    },
+    isReported: {
+      type: Boolean,
+      default: false,
     },
     user: {
       type: mongoose.Schema.ObjectId,

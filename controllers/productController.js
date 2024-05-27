@@ -1,7 +1,9 @@
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors/index");
 const Product = require("../models/Product");
+const Review = require("../models/Review");
 const { createCloudinaryImage } = require("../utils/createCloudinaryImage");
+const featureToArray = require("../utils/featureToArray");
 const cloudinary = require("cloudinary").v2;
 
 const createProduct = async (req, res) => {
@@ -77,6 +79,7 @@ const getAllProducts = async (req, res) => {
     result = result.sort("createdAt");
   }
   const products = await result;
+
   res.status(StatusCodes.OK).json({ products });
 };
 
@@ -147,17 +150,42 @@ const getSpecificProducts = async (req, res) => {
     queryObject.name = { $regex: queryObject.name, $options: "i" };
   }
 
+  const { sortBy, page } = queryObject;
+  delete queryObject.sortBy;
+  delete queryObject.page;
+
   let result = Product.find(queryObject).select(
     "-description -updatedAt  -user"
   );
 
-  if (queryObject.sortBy) {
-    result = result.sort(queryObject.sortBy);
+  let productsBody = [];
+  let productsNeck = [];
+
+  if (category === "guitar") {
+    const allProducts = await Product.find(queryObject).select("body neck");
+    productsBody = featureToArray(allProducts, "body");
+    productsNeck = featureToArray(allProducts, "neck");
+  }
+
+  const productsCount = await Product.countDocuments(queryObject);
+
+  if (sortBy) {
+    result = result.sort(sortBy);
   } else {
     result = result.sort("createdAt");
   }
+
+  const limit = 12;
+
+  const skip = (page - 1) * limit;
+
+  result = result.skip(skip || 0).limit(limit);
+
   const products = await result;
-  res.status(StatusCodes.OK).json({ products });
+
+  res
+    .status(StatusCodes.OK)
+    .json({ products, productsCount, productsBody, productsNeck });
 };
 
 const getSingleProduct = async (req, res) => {
@@ -242,6 +270,8 @@ const deleteProduct = async (req, res) => {
   if (!product) {
     throw new CustomError.NotFoundError(`No product with name: ${name}`);
   }
+  const { _id: productId } = product;
+  const reviews = await Review.deleteMany({ product: productId });
 
   if (product.images) {
     for (const image of product.images) {
@@ -281,6 +311,35 @@ const deleteProductImage = async (req, res) => {
   res.status(StatusCodes.OK).json({ product });
 };
 
+const getProductsFromCart = async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    throw new CustomError.BadRequestError("Your cart is empty");
+  }
+  const idArray = id.split("-");
+  idArray.splice(-1, 1);
+  let products = [];
+  for (const id of idArray) {
+    let productModel = await Product.findOne(
+      { _id: id },
+      { quantity: 1 }
+    ).select("name category price images.imageURL");
+    const { _id, name, category, price, images } = productModel;
+    const { imageURL } = images[0];
+    const product = {
+      _id,
+      name,
+      category,
+      price,
+      imageURL,
+      quantity: 1,
+    };
+    products = [...products, product];
+  }
+
+  res.status(StatusCodes.OK).json({ products });
+};
+
 module.exports = {
   createProduct,
   getAllProducts,
@@ -289,4 +348,5 @@ module.exports = {
   updateProduct,
   deleteProduct,
   deleteProductImage,
+  getProductsFromCart,
 };
