@@ -190,7 +190,7 @@ const getSpecificProducts = async (req, res) => {
 
 const getSingleProduct = async (req, res) => {
   let { name } = req.params;
-  // name = name.replaceAll("_", " ");
+
   const product = await Product.findOne({ name }).populate({
     path: "reviews",
     select: "comment user rating",
@@ -210,7 +210,7 @@ const updateProduct = async (req, res) => {
       result[key] = req.body[key];
     }
   }
-  // name = name.replaceAll("_", " ");
+
   let product = await Product.findOne({ name });
   product = Object.assign(product, result);
   if (!product) {
@@ -320,10 +320,9 @@ const getProductsFromCart = async (req, res) => {
   idArray.splice(-1, 1);
   let products = [];
   for (const id of idArray) {
-    let productModel = await Product.findOne(
-      { _id: id },
-      { quantity: 1 }
-    ).select("name category price images.imageURL");
+    let productModel = await Product.findOne({ _id: id }).select(
+      "name category price images.imageURL"
+    );
     const { _id, name, category, price, images } = productModel;
     const { imageURL } = images[0];
     const product = {

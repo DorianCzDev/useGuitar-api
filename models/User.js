@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
+const countries = require("../utils/countries");
 
 const UserSchema = new mongoose.Schema(
   {
@@ -11,6 +12,12 @@ const UserSchema = new mongoose.Schema(
       maxlength: 30,
       lowercase: true,
       trim: true,
+    },
+    firstName: {
+      type: String,
+    },
+    lastName: {
+      type: String,
     },
     email: {
       type: String,
@@ -38,18 +45,20 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    postal_code: {
+    postCode: {
       type: String,
     },
     address: {
       type: String,
-      lowercase: true,
     },
     city: {
       type: String,
-      lowercase: true,
     },
-    phone_number: {
+    country: {
+      type: String,
+      enum: countries,
+    },
+    phoneNumber: {
       type: String,
     },
   },

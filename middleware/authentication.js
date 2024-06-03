@@ -11,7 +11,6 @@ const authenticateUser = async (req, res, next) => {
       req.user = payload.user;
       return next();
     }
-    console.log("gówno");
     const payload = jwt.verify(refreshToken, process.env.JWT_SECRET);
     const existingToken = await Token.findOne({
       user: payload.user.userId,

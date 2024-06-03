@@ -1,7 +1,12 @@
 const mongoose = require("mongoose");
+const countries = require("../utils/countries");
 
 const SingleOrderItemSchema = mongoose.Schema({
   name: {
+    type: String,
+    required: true,
+  },
+  image: {
     type: String,
     required: true,
   },
@@ -9,7 +14,7 @@ const SingleOrderItemSchema = mongoose.Schema({
     type: Number,
     required: true,
   },
-  amount: {
+  quantity: {
     type: Number,
     required: true,
   },
@@ -22,14 +27,6 @@ const SingleOrderItemSchema = mongoose.Schema({
 
 const OrderSchema = new mongoose.Schema(
   {
-    shippingFee: {
-      type: Number,
-      required: true,
-    },
-    subtotal: {
-      type: Number,
-      required: true,
-    },
     total: {
       type: Number,
       required: true,
@@ -40,17 +37,59 @@ const OrderSchema = new mongoose.Schema(
       enum: ["waiting for payment", "paid", "send", "delivered", "canceled"],
       default: "waiting for payment",
     },
+    clientSecret: {
+      type: String,
+      required: true,
+    },
+    paymentIntentId: {
+      type: String,
+      required: true,
+    },
+    deliveryMethod: {
+      type: String,
+      required: true,
+    },
+    deliveryCost: {
+      type: Number,
+      required: true,
+    },
+    firstName: {
+      type: String,
+      required: true,
+    },
+    lastName: {
+      type: String,
+      required: true,
+    },
+    address: {
+      type: String,
+      required: true,
+    },
+    postCode: {
+      type: String,
+      required: true,
+    },
+    phoneNumber: {
+      type: String,
+      required: true,
+    },
+    city: {
+      type: String,
+      required: true,
+    },
+    country: {
+      type: String,
+      required: true,
+      enum: countries,
+    },
+    email: {
+      type: String,
+      required: true,
+    },
     user: {
       type: mongoose.Schema.ObjectId,
       ref: "User",
       required: true,
-    },
-    clientSecret: {
-      type: String,
-      //   required: true,
-    },
-    paymentIntentId: {
-      type: String,
     },
   },
   { timestamps: true }

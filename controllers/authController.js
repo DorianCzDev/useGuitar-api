@@ -29,11 +29,11 @@ const login = async (req, res) => {
     throw new CustomError.UnauthenticatedError("Invalid email or/and password");
   }
 
-  const { name, role, _id: userId } = user;
+  const { role, _id: userId } = user;
 
   let refreshToken = "";
   const existingToken = await Token.findOne({ user: userId });
-  const tokenUser = { name, role, userId };
+  const tokenUser = { email, role, userId };
   if (existingToken) {
     const { isValid } = existingToken;
     if (!isValid) {
@@ -41,18 +41,21 @@ const login = async (req, res) => {
     }
     refreshToken = existingToken.refreshToken;
     cookieResponse({ res, user: tokenUser, refreshToken });
-    res.status(StatusCodes.OK).json({ name, email });
+    res.status(StatusCodes.OK).json({
+      msg: "Login succesfull",
+    });
     return;
   }
   refreshToken = crypto.randomBytes(40).toString("hex");
-  const userAgent = req.headers["user-agent"];
-  const ip = req.ip;
-  const token = { refreshToken, ip, userAgent, user: userId };
+
+  const token = { refreshToken, user: userId };
 
   await Token.create(token);
   cookieResponse({ res, user: tokenUser, refreshToken });
 
-  res.status(StatusCodes.OK).json({ name, email });
+  res.status(StatusCodes.OK).json({
+    msg: "Login succesfull",
+  });
 };
 
 const logout = async (req, res) => {

@@ -3,15 +3,21 @@ const {
   getAllOrders,
   createOrder,
   getSingleOrder,
-  updateOrder,
+  updateOrderStatus,
   getUserOrders,
+  deleteOrder,
 } = require("../controllers/orderContoller");
+const { authenticateUser } = require("../middleware/authentication");
 const router = express.Router();
 
-router.route("/").get(getAllOrders).post(createOrder);
+router.route("/").get(getAllOrders).post(authenticateUser, createOrder);
 
-router.route("/getMyOrders").get(getUserOrders);
+router.route("/getUserOrders/:id").get(authenticateUser, getUserOrders);
 
-router.route("/:id").get(getSingleOrder).patch(updateOrder);
+router
+  .route("/:id")
+  .get(getSingleOrder)
+  .patch(updateOrderStatus)
+  .delete(deleteOrder);
 
 module.exports = router;
