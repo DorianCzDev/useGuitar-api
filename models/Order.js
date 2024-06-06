@@ -34,7 +34,13 @@ const OrderSchema = new mongoose.Schema(
     orderItems: [SingleOrderItemSchema],
     status: {
       type: String,
-      enum: ["waiting for payment", "paid", "send", "delivered", "canceled"],
+      enum: [
+        "waiting for payment",
+        "waiting for shipment",
+        "send",
+        "delivered",
+        "canceled",
+      ],
       default: "waiting for payment",
     },
     clientSecret: {

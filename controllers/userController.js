@@ -18,19 +18,25 @@ const getSingleUser = async (req, res) => {
   res.status(StatusCodes.OK).json({ user });
 };
 
-const updateUser = async (req, res) => {
-  const { id } = req.params;
-  const user = await User.findOne({ _id: id });
-  if (!user) {
-    throw new CustomError.NotFoundError(`No user with id: ${id}`);
+const updateUserPassword = async (req, res) => {
+  const { currPassword, newPassword } = req.body;
+  if (!currPassword || !newPassword) {
+    throw new CustomError.BadRequestError("Please provide all values");
+  }
+  const user = await User.findOne({ _id: req.user.userId });
+
+  checkPermission(req.user, user._id);
+
+  const isPasswordCorrect = await user.comparePassword(currPassword);
+
+  if (!isPasswordCorrect) {
+    throw new CustomError.UnauthenticatedError("Invalid credentials");
   }
 
-  user.name = req.body.name;
-  user.email = req.body.email;
-  user.password = req.body.password;
+  user.password = newPassword;
 
   await user.save();
-  res.status(StatusCodes.OK).json({ msg: "User successfully updated" });
+  res.status(StatusCodes.OK).json({ msg: "Password updated!" });
 };
 
 const updateOrderingUser = async (req, res) => {
@@ -76,7 +82,7 @@ const deleteUser = async (req, res) => {
 
 const getCurrentUser = async (req, res) => {
   const user = await User.findOne({ _id: req.user.userId }).select(
-    "-role -createdAt -updatedAt -_id -__v -password -isVerified"
+    "-role -createdAt -updatedAt -__v -password -isVerified"
   );
   if (!user) {
     throw new CustomError.BadRequestError("Please log in");
@@ -88,7 +94,7 @@ const getCurrentUser = async (req, res) => {
 module.exports = {
   getAllUsers,
   getSingleUser,
-  updateUser,
+  updateUserPassword,
   deleteUser,
   getCurrentUser,
   updateOrderingUser,

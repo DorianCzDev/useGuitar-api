@@ -21,7 +21,7 @@ const updateDelivery = async (req, res) => {
   const { id } = req.params;
   const delivery = await Delivery.findOneAndUpdate({ _id: id }, req.body);
   if (!delivery) {
-    throw new CustomError.BadRequestError(`No delivery with ${id}`);
+    throw new CustomError.NotFoundError(`No delivery with ${id}`);
   }
   res.status(StatusCodes.OK).json({ delivery });
 };
@@ -30,7 +30,7 @@ const deleteDelivery = async (req, res) => {
   const { id } = req.params;
   const delivery = await Delivery.findOneAndDelete({ _id: id });
   if (!delivery) {
-    throw new CustomError.BadRequestError(`No delivery with ${id}`);
+    throw new CustomError.NotFoundError(`No delivery with ${id}`);
   }
 
   res.status(StatusCodes.OK).json({ delivery });

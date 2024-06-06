@@ -4,7 +4,7 @@ const router = express.Router();
 const {
   getAllUsers,
   getSingleUser,
-  updateUser,
+  updateUserPassword,
   deleteUser,
   getCurrentUser,
   updateOrderingUser,
@@ -19,10 +19,11 @@ router
   .get(authenticateUser, permission("admin"), getAllUsers)
   .patch(authenticateUser, updateOrderingUser);
 router.route("/getCurrentUser").get(authenticateUser, getCurrentUser);
+router.route("/updatePassword").patch(authenticateUser, updateUserPassword);
 router
   .route("/:id")
   .get(authenticateUser, getSingleUser)
-  .patch(authenticateUser, updateUser)
+
   .delete(authenticateUser, permission("admin"), deleteUser);
 
 module.exports = router;

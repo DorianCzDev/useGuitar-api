@@ -13,10 +13,12 @@ const getAllOrders = async (req, res) => {
 
 const getSingleOrder = async (req, res) => {
   const { id } = req.params;
+
   const order = await Order.findOne({ _id: id });
   if (!order) {
-    throw new CustomError.BadRequestError(`No order with id: ${id}`);
+    throw new CustomError.NotFoundError(`No order with id: ${id}`);
   }
+  checkPermission(req.user, order.user);
 
   res.status(StatusCodes.OK).json({ order });
 };
@@ -26,7 +28,7 @@ const getUserOrders = async (req, res) => {
   checkPermission(req.user, userId);
   const orders = await Order.find({ user: userId });
   if (!orders) {
-    throw CustomError.BadRequestError(`No orders for user with id: ${userId}`);
+    throw CustomError.NotFoundError(`No orders for user with id: ${userId}`);
   }
   res.status(StatusCodes.OK).json({ orders });
 };
@@ -52,7 +54,7 @@ const createOrder = async (req, res) => {
   for (const clientProduct of clientProducts) {
     const product = await Product.findOne({ _id: clientProduct.product });
     if (!product) {
-      throw new CustomError.BadRequestError(`No product with id: ${id}`);
+      throw new CustomError.NotFoundError(`No product with id: ${id}`);
     }
     orderItems = [...orderItems, { product, quantity: clientProduct.quantity }];
   }
@@ -62,7 +64,7 @@ const createOrder = async (req, res) => {
   });
 
   if (!delivery || delivery.length === 0) {
-    throw new CustomError.BadRequestError(
+    throw new CustomError.NotFoundError(
       `No delivery method for ${deliverySupplier}`
     );
   }
@@ -74,7 +76,7 @@ const createOrder = async (req, res) => {
   );
 
   if (serverTotalPrice !== clientTotalPrice) {
-    throw new CustomError.BadRequestError("Price not match");
+    throw new CustomError.NotFoundError("Price not match");
   }
 
   const paymentIntent = await stripe.paymentIntents.create({
@@ -108,9 +110,9 @@ const updateOrderStatus = async (req, res) => {
   const { id } = req.params;
   const order = await Order.findOne({ _id: id });
   if (!order) {
-    throw new CustomError.BadRequestError(`No order with id: ${id}`);
+    throw new CustomError.NotFoundError(`No order with id: ${id}`);
   }
-  order.status = "paid";
+  order.status = "waiting for shipment";
   await order.save();
   res.status(StatusCodes.OK).json({ order });
 };
@@ -119,7 +121,7 @@ const deleteOrder = async (req, res) => {
   const { id } = req.params;
   const order = await Order.deleteMany({});
   if (!order) {
-    throw new CustomError.BadRequestError(`No order with id: ${id}`);
+    throw new CustomError.NotFoundError(`No order with id: ${id}`);
   }
 
   res.status(StatusCodes.OK).json({ order });

@@ -5,14 +5,6 @@ const countries = require("../utils/countries");
 
 const UserSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: [true, "Please provide name"],
-      minlength: 3,
-      maxlength: 30,
-      lowercase: true,
-      trim: true,
-    },
     firstName: {
       type: String,
     },
