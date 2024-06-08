@@ -18,7 +18,6 @@ const UserSchema = new mongoose.Schema(
         validator: validator.isEmail,
         message: "Please provide valid email",
       },
-      maxlength: 22,
       lowercase: true,
       unique: true,
     },
@@ -26,7 +25,7 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please provide password"],
       minlength: 6,
-      maxlength: 22,
+      maxlength: 20,
     },
     role: {
       type: String,
@@ -34,6 +33,19 @@ const UserSchema = new mongoose.Schema(
       default: "user",
     },
     isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+    },
+    forgotPasswordToken: {
+      type: String,
+    },
+    forgotPasswordTokenExpirationDate: {
+      type: Date,
+    },
+    isActive: {
       type: Boolean,
       default: true,
     },
@@ -60,6 +72,7 @@ const UserSchema = new mongoose.Schema(
 );
 
 UserSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
