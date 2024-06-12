@@ -76,11 +76,11 @@ const createOrder = async (req, res) => {
   );
 
   if (serverTotalPrice !== clientTotalPrice) {
-    throw new CustomError.NotFoundError("Price not match");
+    throw new CustomError.BadRequestError("Price not match");
   }
 
   const paymentIntent = await stripe.paymentIntents.create({
-    amount: `${serverTotalPrice}00`,
+    amount: serverTotalPrice,
     currency: "usd",
   });
 
@@ -105,8 +105,8 @@ const createOrder = async (req, res) => {
   res.status(StatusCodes.CREATED).json({ order });
 };
 
+//temp endpoint for testing until deploy
 const updateOrderStatus = async (req, res) => {
-  //temp endpoint for testing until deploy
   const { id } = req.params;
   const order = await Order.findOne({ _id: id });
   if (!order) {
@@ -117,6 +117,7 @@ const updateOrderStatus = async (req, res) => {
   res.status(StatusCodes.OK).json({ order });
 };
 
+//temp
 const deleteOrder = async (req, res) => {
   const { id } = req.params;
   const order = await Order.deleteMany({});

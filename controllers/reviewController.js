@@ -75,10 +75,40 @@ const updateReview = async (req, res) => {
   res.status(StatusCodes.OK).json({ review });
 };
 
+const reportReview = async (req, res) => {
+  const { id } = req.params;
+  const review = await Review.findOne({ _id: id });
+  if (!review) {
+    throw new CustomError.NotFoundError(`No review with id: ${id}`);
+  }
+
+  review.isReported = true;
+
+  await review.save();
+  res.status(StatusCodes.OK).json({ msg: "Review reported" });
+};
+
+//temp
+const getAllReviews = async (req, res) => {
+  const reviews = await Review.find({});
+
+  res.status(StatusCodes.OK).json({ reviews });
+};
+
+//temp
+const deleteAllReviews = async (req, res) => {
+  const reviews = await Review.deleteMany({});
+
+  res.status(StatusCodes.OK).json({ reviews });
+};
+
 module.exports = {
   getSingleProductReviews,
   getUserReviews,
   createReview,
   deleteReview,
   updateReview,
+  reportReview,
+  getAllReviews,
+  deleteAllReviews,
 };

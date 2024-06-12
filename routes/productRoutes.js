@@ -13,6 +13,8 @@ const {
   deleteProductImage,
   getSpecificProducts,
   getProductsFromCart,
+  getDiscountedProducts,
+  getFeaturedProducts,
 } = require("../controllers/productController");
 const {
   authenticateUser,
@@ -23,6 +25,9 @@ router
   .route("/")
   .post(authenticateUser, permission("admin"), upload.any(), createProduct)
   .get(getAllProducts);
+
+router.route("/discountedProducts").get(getDiscountedProducts);
+router.route("/featuredProducts").get(getFeaturedProducts);
 
 router.route("/category/:category").get(getSpecificProducts);
 router.route("/getMyCart/:id").get(getProductsFromCart);

@@ -44,9 +44,16 @@ const ProductSchema = new mongoose.Schema(
         "bass multi effect",
       ],
     },
-    price: {
+    discount: {
+      type: Number,
+      default: 0,
+    },
+    noDiscountPrice: {
       type: Number,
       required: [true, "Please provide product price"],
+    },
+    price: {
+      type: Number,
     },
     description: {
       type: String,
@@ -194,6 +201,15 @@ ProductSchema.virtual("reviews", {
   localField: "_id",
   foreignField: "product",
   justOne: false,
+});
+
+ProductSchema.pre("save", async function () {
+  if (this.discount > 0) {
+    this.price =
+      this.noDiscountPrice - this.noDiscountPrice * (this.discount / 100);
+  } else {
+    this.price = this.noDiscountPrice;
+  }
 });
 
 module.exports = mongoose.model("Product", ProductSchema);

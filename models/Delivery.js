@@ -9,6 +9,10 @@ const DeliverySchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  time: {
+    type: Number,
+    required: true,
+  },
 });
 
 module.exports = mongoose.model("Delivery", DeliverySchema);

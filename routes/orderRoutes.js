@@ -21,6 +21,6 @@ router
   .route("/:id")
   .get(authenticateUser, getSingleOrder)
   .patch(updateOrderStatus)
-  .delete(permission("admin"), deleteOrder);
+  .delete(deleteOrder);
 
 module.exports = router;

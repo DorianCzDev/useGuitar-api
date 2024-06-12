@@ -93,6 +93,9 @@ const getSpecificProducts = async (req, res) => {
 
   queryEntries.map((arrayEl) => {
     if (arrayEl[0].includes("min") || arrayEl[0].includes("max")) {
+      if (arrayEl[0].includes("price")) {
+        arrayEl[1] = arrayEl[1] * 100;
+      }
       queryFilters = [...queryFilters, [arrayEl[0], arrayEl[1]]];
     } else {
       queryArray = [...queryArray, [arrayEl[0], arrayEl[1]]];
@@ -339,6 +342,24 @@ const getProductsFromCart = async (req, res) => {
   res.status(StatusCodes.OK).json({ products });
 };
 
+const getDiscountedProducts = async (req, res) => {
+  const products = await Product.find({ discount: { $gt: 0 } })
+    .select("price discount name category _id images.imageURL")
+    .sort("-discount")
+    .limit(5);
+
+  res.status(StatusCodes.OK).json({ products });
+};
+
+const getFeaturedProducts = async (req, res) => {
+  const products = await Product.find({ featured: true })
+    .select("price discount name category _id images.imageURL featured")
+    .sort("-price")
+    .limit(5);
+
+  res.status(StatusCodes.OK).json({ products });
+};
+
 module.exports = {
   createProduct,
   getAllProducts,
@@ -348,4 +369,6 @@ module.exports = {
   deleteProduct,
   deleteProductImage,
   getProductsFromCart,
+  getDiscountedProducts,
+  getFeaturedProducts,
 };
