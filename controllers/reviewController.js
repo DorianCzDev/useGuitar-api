@@ -3,14 +3,40 @@ const CustomError = require("../errors/index");
 const Product = require("../models/Product");
 const Review = require("../models/Review");
 const checkPermission = require("../utils/checkPermission");
+const featureToArray = require("../utils/featureToArray");
 
 const getSingleProductReviews = async (req, res) => {
   const { id } = req.params;
-  const reviews = await Review.find({ product: id });
+  const { rating } = req.query;
+
+  let reviews = await Review.find({ product: id });
+
+  let ratingsCount = [
+    ["1", 0],
+    ["2", 0],
+    ["3", 0],
+    ["4", 0],
+    ["5", 0],
+  ];
+
+  const ratingsArray = featureToArray(reviews, "rating");
+
+  for (const ratingCount of ratingsCount) {
+    for (const ratingArray of ratingsArray) {
+      if (ratingCount[0] === ratingArray[0]) ratingCount[1] = ratingArray[1];
+    }
+  }
+
+  if (!rating) {
+    reviews = await Review.find({ product: id });
+  } else {
+    reviews = await Review.find({ product: id, rating });
+  }
   if (!reviews) {
     throw new CustomError.NotFoundError(`No reviews with product id: ${id}`);
   }
-  res.status(StatusCodes.OK).json({ count: reviews.length, reviews });
+
+  res.status(StatusCodes.OK).json({ ratingsCount, reviews });
 };
 
 const getUserReviews = async (req, res) => {
