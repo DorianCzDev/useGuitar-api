@@ -16,7 +16,7 @@ const authenticateUser = async (req, res, next) => {
       user: payload.user.userId,
       refreshToken: payload.refreshToken,
     });
-    if (!existingToken || !existingToken?.isValid) {
+    if (!existingToken) {
       throw new CustomError.UnauthenticatedError("Authentication Invalid");
     }
     cookieResponse({

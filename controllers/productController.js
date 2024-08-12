@@ -63,27 +63,36 @@ const createProduct = async (req, res) => {
 };
 
 const getAllProducts = async (req, res) => {
-  const { sortBy, name } = req.query;
+  const { sortBy, name, page } = req.query;
   const queryObject = {};
   if (name) {
     queryObject.name = { $regex: name, $options: "i" };
   }
 
   let result = Product.find(queryObject).select(
-    "-description -updatedAt  -user"
+    "-description -updatedAt -user"
   );
+
+  const productsCount = await Product.countDocuments(queryObject);
 
   if (sortBy) {
     result = result.sort(sortBy);
   } else {
     result = result.sort("createdAt");
   }
+
+  const limit = 10;
+
+  const skip = (page - 1) * limit;
+
+  result = result.skip(skip || 0).limit(limit);
+
   const products = await result;
 
-  res.status(StatusCodes.OK).json({ products });
+  res.status(StatusCodes.OK).json({ products, productsCount });
 };
 
-const getSpecificProducts = async (req, res) => {
+const getProductsByCategory = async (req, res) => {
   const { category } = req.params;
 
   let queryEntries = Object.entries(req.query);
@@ -355,7 +364,7 @@ const getFeaturedProducts = async (req, res) => {
   const products = await Product.find({ featured: true })
     .select("price discount name category _id images.imageURL featured")
     .sort("-price")
-    .limit(5);
+    .limit(10);
 
   res.status(StatusCodes.OK).json({ products });
 };
@@ -363,7 +372,7 @@ const getFeaturedProducts = async (req, res) => {
 module.exports = {
   createProduct,
   getAllProducts,
-  getSpecificProducts,
+  getProductsByCategory,
   getSingleProduct,
   updateProduct,
   deleteProduct,

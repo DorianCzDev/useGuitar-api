@@ -43,11 +43,8 @@ const login = async (req, res) => {
     throw new CustomError.UnauthenticatedError("Invalid email or/and password");
   }
 
-  if (!user.isVerified) {
-    throw new CustomError.UnauthenticatedError("Please verify your email");
-  }
-  if (!user.isActive) {
-    throw new CustomError.UnauthenticatedError("Your account is blocked");
+  if (!user.role || user.role !== "admin") {
+    throw new CustomError.UnauthenticatedError("Invalid Crudentials");
   }
 
   const { role, _id: userId } = user;
@@ -56,16 +53,11 @@ const login = async (req, res) => {
   const existingToken = await Token.findOne({ user: userId });
   const tokenUser = { email, role, userId };
   if (existingToken) {
-    const { isValid } = existingToken;
-    if (!isValid) {
-      throw new CustomError.UnauthenticatedError("Invalid Crudentials");
-    }
     refreshToken = existingToken.refreshToken;
     cookieResponse({ res, user: tokenUser, refreshToken });
-    res.status(StatusCodes.OK).json({
+    return res.status(StatusCodes.OK).json({
       msg: "Login succesfull",
     });
-    return;
   }
   refreshToken = crypto.randomBytes(40).toString("hex");
 

@@ -11,7 +11,7 @@ const {
   updateProduct,
   deleteProduct,
   deleteProductImage,
-  getSpecificProducts,
+  getProductsByCategory,
   getProductsFromCart,
   getDiscountedProducts,
   getFeaturedProducts,
@@ -29,7 +29,7 @@ router
 router.route("/discountedProducts").get(getDiscountedProducts);
 router.route("/featuredProducts").get(getFeaturedProducts);
 
-router.route("/category/:category").get(getSpecificProducts);
+router.route("/category/:category").get(getProductsByCategory);
 router.route("/getMyCart/:id").get(getProductsFromCart);
 router
   .route("/deleteImage/:name")
