@@ -11,10 +11,6 @@ const {
   updateProduct,
   deleteProduct,
   deleteProductImage,
-  getProductsByCategory,
-  getProductsFromCart,
-  getDiscountedProducts,
-  getFeaturedProducts,
 } = require("../controllers/productController");
 const {
   authenticateUser,
@@ -26,11 +22,6 @@ router
   .post(authenticateUser, permission("admin"), upload.any(), createProduct)
   .get(getAllProducts);
 
-router.route("/discountedProducts").get(getDiscountedProducts);
-router.route("/featuredProducts").get(getFeaturedProducts);
-
-router.route("/category/:category").get(getProductsByCategory);
-router.route("/getMyCart/:id").get(getProductsFromCart);
 router
   .route("/deleteImage/:name")
   .delete(authenticateUser, permission("admin"), deleteProductImage);

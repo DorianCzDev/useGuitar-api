@@ -92,114 +92,6 @@ const getAllProducts = async (req, res) => {
   res.status(StatusCodes.OK).json({ products, productsCount });
 };
 
-const getProductsByCategory = async (req, res) => {
-  const { category } = req.params;
-
-  let queryEntries = Object.entries(req.query);
-
-  let queryArray = [];
-  let queryFilters = [];
-
-  queryEntries.map((arrayEl) => {
-    if (arrayEl[0].includes("min") || arrayEl[0].includes("max")) {
-      if (arrayEl[0].includes("price")) {
-        arrayEl[1] = arrayEl[1] * 100;
-      }
-      queryFilters = [...queryFilters, [arrayEl[0], arrayEl[1]]];
-    } else {
-      queryArray = [...queryArray, [arrayEl[0], arrayEl[1]]];
-    }
-  });
-
-  let queryFiltersArray = [];
-  queryFilters.map((arrayEl) => {
-    const value = arrayEl[1];
-    let items = [];
-    if (arrayEl[0].includes("-")) {
-      items = arrayEl[0].split("-");
-    }
-    const [operator, field] = items;
-
-    queryFiltersArray = [...queryFiltersArray, [operator, field, value]];
-  });
-
-  let filtersObject = {};
-
-  queryFiltersArray.map((arrayEl) => {
-    let isFirtsTimeField = true;
-    let [operator, field, value] = arrayEl;
-    if (operator === "max") {
-      operator = "$lte";
-    } else if (operator === "min") {
-      operator = "$gte";
-    }
-    const keys = Object.keys(filtersObject);
-    let objectEl;
-    keys.map((key) => {
-      if (key === field) {
-        filtersObject[key] = {
-          ...filtersObject[key],
-          [operator]: Number(value),
-        };
-        isFirtsTimeField = false;
-      }
-    });
-    if (keys.length === 0 || isFirtsTimeField) {
-      objectEl = {
-        [field]: {
-          [operator]: Number(value),
-        },
-      };
-      filtersObject = { ...filtersObject, ...objectEl };
-    }
-  });
-
-  const queryObjectFromArray = Object.fromEntries(queryArray);
-
-  let queryObject = { ...queryObjectFromArray, ...filtersObject, category };
-
-  if (queryObject.name) {
-    queryObject.name = { $regex: queryObject.name, $options: "i" };
-  }
-
-  const { sortBy, page } = queryObject;
-  delete queryObject.sortBy;
-  delete queryObject.page;
-
-  let result = Product.find(queryObject).select(
-    "-description -updatedAt  -user"
-  );
-
-  let productsBody = [];
-  let productsNeck = [];
-
-  if (category === "guitar") {
-    const allProducts = await Product.find(queryObject).select("body neck");
-    productsBody = featureToArray(allProducts, "body");
-    productsNeck = featureToArray(allProducts, "neck");
-  }
-
-  const productsCount = await Product.countDocuments(queryObject);
-
-  if (sortBy) {
-    result = result.sort(sortBy);
-  } else {
-    result = result.sort("createdAt");
-  }
-
-  const limit = 12;
-
-  const skip = (page - 1) * limit;
-
-  result = result.skip(skip || 0).limit(limit);
-
-  const products = await result;
-
-  res
-    .status(StatusCodes.OK)
-    .json({ products, productsCount, productsBody, productsNeck });
-};
-
 const getSingleProduct = async (req, res) => {
   let { name } = req.params;
 
@@ -323,61 +215,11 @@ const deleteProductImage = async (req, res) => {
   res.status(StatusCodes.OK).json({ product });
 };
 
-const getProductsFromCart = async (req, res) => {
-  const { id } = req.params;
-  if (!id) {
-    throw new CustomError.BadRequestError("Your cart is empty");
-  }
-  const idArray = id.split("-");
-  idArray.splice(-1, 1);
-  let products = [];
-  for (const id of idArray) {
-    let productModel = await Product.findOne({ _id: id }).select(
-      "name category price images.imageURL"
-    );
-    const { _id, name, category, price, images } = productModel;
-    const { imageURL } = images[0];
-    const product = {
-      _id,
-      name,
-      category,
-      price,
-      imageURL,
-      quantity: 1,
-    };
-    products = [...products, product];
-  }
-
-  res.status(StatusCodes.OK).json({ products });
-};
-
-const getDiscountedProducts = async (req, res) => {
-  const products = await Product.find({ discount: { $gt: 0 } })
-    .select("price discount name category _id images.imageURL")
-    .sort("-discount")
-    .limit(5);
-
-  res.status(StatusCodes.OK).json({ products });
-};
-
-const getFeaturedProducts = async (req, res) => {
-  const products = await Product.find({ featured: true })
-    .select("price discount name category _id images.imageURL featured")
-    .sort("-price")
-    .limit(10);
-
-  res.status(StatusCodes.OK).json({ products });
-};
-
 module.exports = {
   createProduct,
   getAllProducts,
-  getProductsByCategory,
   getSingleProduct,
   updateProduct,
   deleteProduct,
   deleteProductImage,
-  getProductsFromCart,
-  getDiscountedProducts,
-  getFeaturedProducts,
 };
