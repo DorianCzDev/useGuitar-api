@@ -3,8 +3,8 @@ const CustomError = require("../errors/index");
 const Delivery = require("../models/Delivery");
 
 const createDelivery = async (req, res) => {
-  const { name, price } = req.body;
-  if (!name || !price) {
+  const { supplier, cost, time } = req.body;
+  if (!supplier || !cost || !time) {
     throw new CustomError.BadRequestError("Please provide all required values");
   }
   const delivery = await Delivery.create(req.body);
@@ -15,6 +15,13 @@ const createDelivery = async (req, res) => {
 const getAllDeliveries = async (req, res) => {
   const deliveries = await Delivery.find({});
   res.status(StatusCodes.OK).json({ deliveries });
+};
+
+const getSingleDelivery = async (req, res) => {
+  const { id } = req.params;
+  const delivery = await Delivery.findOne({ _id: id });
+  console.log(id);
+  res.status(StatusCodes.OK).json({ delivery });
 };
 
 const updateDelivery = async (req, res) => {
@@ -40,5 +47,6 @@ module.exports = {
   createDelivery,
   getAllDeliveries,
   updateDelivery,
+  getSingleDelivery,
   deleteDelivery,
 };

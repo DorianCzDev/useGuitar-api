@@ -22,7 +22,7 @@ const deleteReview = async (req, res) => {
   res.status(StatusCodes.OK).json({ review });
 };
 
-const getAllReviews = async (req, res) => {
+const getReportedReviews = async (req, res) => {
   const reviews = await Review.find({});
 
   res.status(StatusCodes.OK).json({ reviews });
@@ -38,6 +38,6 @@ const deleteAllReviews = async (req, res) => {
 module.exports = {
   getUserReviews,
   deleteReview,
-  getAllReviews,
+  getReportedReviews,
   deleteAllReviews,
 };

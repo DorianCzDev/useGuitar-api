@@ -62,9 +62,5 @@ const logout = async (req, res) => {
 
 module.exports = {
   login,
-  register,
   logout,
-  verifyEmail,
-  forgotPassword,
-  resetPassword,
 };

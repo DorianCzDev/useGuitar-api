@@ -2,7 +2,7 @@ const express = require("express");
 const {
   getUserReviews,
   deleteReview,
-  getAllReviews,
+  getReportedReviews,
   deleteAllReviews,
 } = require("../controllers/reviewController");
 const {
@@ -11,7 +11,7 @@ const {
 } = require("../middleware/authentication");
 const router = express.Router();
 
-router.route("/").get(getAllReviews).delete(deleteAllReviews);
+router.route("/").get(getReportedReviews).delete(deleteAllReviews);
 router.route("/user/:id").get(authenticateUser, getUserReviews);
 router
   .route("/:id")

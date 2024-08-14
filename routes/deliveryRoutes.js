@@ -10,6 +10,7 @@ const {
   getAllDeliveries,
   updateDelivery,
   deleteDelivery,
+  getSingleDelivery,
 } = require("../controllers/deliveryController");
 
 router
@@ -18,7 +19,8 @@ router
   .get(getAllDeliveries);
 router
   .route("/:id")
-  .patch(authenticateUser, permission("admin"), updateDelivery);
+  .patch(authenticateUser, permission("admin"), updateDelivery)
+  .get(getSingleDelivery);
 
 router
   .route("/:id")
