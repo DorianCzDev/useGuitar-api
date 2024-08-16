@@ -1,9 +1,9 @@
 const express = require("express");
 const {
-  getUserReviews,
-  deleteReview,
+  deleteReportedReview,
   getReportedReviews,
   deleteAllReviews,
+  deleteReviewFromReported,
 } = require("../controllers/reviewController");
 const {
   authenticateUser,
@@ -11,10 +11,13 @@ const {
 } = require("../middleware/authentication");
 const router = express.Router();
 
-router.route("/").get(getReportedReviews).delete(deleteAllReviews);
-router.route("/user/:id").get(authenticateUser, getUserReviews);
+router
+  .route("/")
+  .get(authenticateUser, permission("admin"), getReportedReviews)
+  .delete(deleteAllReviews);
 router
   .route("/:id")
-  .delete(authenticateUser, permission("admin"), deleteReview);
+  .delete(authenticateUser, permission("admin"), deleteReportedReview)
+  .patch(authenticateUser, permission("admin"), deleteReviewFromReported);
 
 module.exports = router;

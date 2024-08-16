@@ -1,10 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors/index");
 const Order = require("../models/Order");
-const Delivery = require("../models/Delivery");
-const Product = require("../models/Product");
 const checkPermission = require("../utils/checkPermission");
-const stripe = require("stripe")(process.env.STRIPE_KEY);
 
 const getAllOrders = async (req, res) => {
   const { email, lastName, page, id } = req.query;
