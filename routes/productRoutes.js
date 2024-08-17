@@ -11,6 +11,7 @@ const {
   updateProduct,
   deleteProduct,
   deleteProductImage,
+  changeProductInventory,
 } = require("../controllers/productController");
 const {
   authenticateUser,
@@ -31,5 +32,9 @@ router
   .get(getSingleProduct)
   .patch(authenticateUser, permission("admin"), upload.any(), updateProduct)
   .delete(authenticateUser, permission("admin"), deleteProduct);
+
+router
+  .route("/inventory/:name")
+  .patch(authenticateUser, permission("admin"), changeProductInventory);
 
 module.exports = router;

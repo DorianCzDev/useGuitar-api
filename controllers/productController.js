@@ -3,7 +3,6 @@ const CustomError = require("../errors/index");
 const Product = require("../models/Product");
 const Review = require("../models/Review");
 const { createCloudinaryImage } = require("../utils/createCloudinaryImage");
-const featureToArray = require("../utils/featureToArray");
 const cloudinary = require("cloudinary").v2;
 
 const createProduct = async (req, res) => {
@@ -215,6 +214,24 @@ const deleteProductImage = async (req, res) => {
   res.status(StatusCodes.OK).json({ product });
 };
 
+const changeProductInventory = async (req, res) => {
+  const { name } = req.params;
+  const { operation, quantity } = req.query;
+  const product = await Product.findOne({ name });
+  if (operation === "add") {
+    product.inventory = product.inventory + Number(quantity);
+  } else if (operation === "remove") {
+    product.inventory = product.inventory - Number(quantity);
+  }
+  if (product.inventory < 0) {
+    product.inventory = 0;
+  }
+
+  await product.save();
+
+  res.status(StatusCodes.OK).json({ product });
+};
+
 module.exports = {
   createProduct,
   getAllProducts,
@@ -222,4 +239,5 @@ module.exports = {
   updateProduct,
   deleteProduct,
   deleteProductImage,
+  changeProductInventory,
 };
