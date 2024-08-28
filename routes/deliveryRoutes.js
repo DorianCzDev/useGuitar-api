@@ -16,11 +16,11 @@ const {
 router
   .route("/")
   .post(authenticateUser, permission("admin"), createDelivery)
-  .get(getAllDeliveries);
+  .get(authenticateUser, permission("admin"), getAllDeliveries);
 router
   .route("/:id")
   .patch(authenticateUser, permission("admin"), updateDelivery)
-  .get(getSingleDelivery);
+  .get(authenticateUser, permission("admin"), getSingleDelivery);
 
 router
   .route("/:id")

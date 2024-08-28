@@ -1,7 +1,8 @@
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../errors/index");
 const Order = require("../models/Order");
-const checkPermission = require("../utils/checkPermission");
+const Product = require("../models/Product");
+const { format } = require("date-fns");
 
 const getAllOrders = async (req, res) => {
   const { email, lastName, page, id } = req.query;
@@ -38,22 +39,9 @@ const getAllOrders = async (req, res) => {
 const getSingleOrder = async (req, res) => {
   const { id } = req.params;
   const order = await Order.findOne({ _id: id });
-  checkPermission(req.user, order.user);
   if (!order) {
     throw new CustomError.NotFoundError(`No order with id: ${id}`);
   }
-  res.status(StatusCodes.OK).json({ order });
-};
-
-//temp endpoint for testing until deploy
-const updateOrderStatus = async (req, res) => {
-  const { id } = req.params;
-  const order = await Order.findOne({ _id: id });
-  if (!order) {
-    throw new CustomError.NotFoundError(`No order with id: ${id}`);
-  }
-  order.status = "waiting for shipment";
-  await order.save();
   res.status(StatusCodes.OK).json({ order });
 };
 
@@ -95,9 +83,186 @@ const updateOrder = async (req, res) => {
   res.status(StatusCodes.OK).json({ msg: "Order updated" });
 };
 
+const getOrdersStats = async (req, res) => {
+  const d = new Date();
+  const pastYear = d.getFullYear() - 1;
+  d.setFullYear(pastYear);
+  d.setDate(1);
+
+  const orders = await Order.find({
+    status: ["send", "waiting for shipment"],
+    createdAt: { $gte: d },
+  });
+
+  let dates = [];
+
+  dates = orders.map((order) => {
+    const date = new Date(order.createdAt);
+    return format(date, "MMM yy");
+  });
+
+  const datesWithOrdersAmounts = dates.reduce((prev, cur) => {
+    prev[cur] = (prev[cur] || 0) + 1;
+    return prev;
+  }, {});
+
+  const placedOrdersByDate = Object.entries(datesWithOrdersAmounts).map(
+    (entry) => {
+      return {
+        month: entry[0],
+        amount: entry[1],
+      };
+    }
+  );
+
+  const monthOrder = {
+    Jan: 0,
+    Feb: 1,
+    Mar: 2,
+    Apr: 3,
+    May: 4,
+    Jun: 5,
+    Jul: 6,
+    Aug: 7,
+    Sep: 8,
+    Oct: 9,
+    Nov: 10,
+    Dec: 11,
+  };
+
+  placedOrdersByDate.sort((a, b) => {
+    const [monthA, yearA] = a.month.split(" ");
+    const [monthB, yearB] = b.month.split(" ");
+
+    if (yearA !== yearB) {
+      return yearA - yearB;
+    }
+
+    return monthOrder[monthA] - monthOrder[monthB];
+  });
+
+  const allOrdersTotal = orders.reduce((acc, order) => acc + order.total, 0);
+  let allOrdersTotalProducts = 0;
+  orders.map((order) =>
+    order.orderItems.map(
+      (item) =>
+        (allOrdersTotalProducts = allOrdersTotalProducts + item.quantity)
+    )
+  );
+
+  const products = await Product.find({}).select("subcategory name images");
+
+  let salesBySubcategory = [];
+  let productsArray = [];
+
+  // I first tried to fetch every product separately but it took server 12 second
+  //and i decided to change my strategy to something that may be a little ugly, but effective
+
+  // for (const order of orders) {
+  //   for (const item of order.orderItems) {
+  //     const product = await Product.find({ _id: item.product }).select(
+  //       "subcategory"
+  //     );
+  //   }
+  // }
+
+  function getRandomColor() {
+    r = Math.floor(Math.random() * 256);
+    g = Math.floor(Math.random() * 256);
+    b = Math.floor(Math.random() * 256);
+    return `rgb(${r}, ${g}, ${b})`;
+  }
+
+  for (const order of orders) {
+    for (const item of order.orderItems) {
+      for (const product of products) {
+        if (product.name === item.name) {
+          //getting values by product subcategory
+          if (salesBySubcategory.length < 1) {
+            salesBySubcategory = [
+              ...salesBySubcategory,
+              {
+                subcategory: product.subcategory,
+                value: item.quantity,
+                color: getRandomColor(),
+              },
+            ];
+          } else {
+            let flag = false;
+            salesBySubcategory.forEach((obj, index) => {
+              if (obj.subcategory === product.subcategory && !flag) {
+                flag = true;
+                obj.value = obj.value + item.quantity;
+              } else if (!flag && index === salesBySubcategory.length - 1) {
+                flag = true;
+                salesBySubcategory = [
+                  ...salesBySubcategory,
+                  {
+                    subcategory: product.subcategory,
+                    value: item.quantity,
+                    color: getRandomColor(),
+                  },
+                ];
+              }
+            });
+            //getting values by product name
+            if (productsArray.length < 1) {
+              productsArray = [
+                ...productsArray,
+                {
+                  name: product.name,
+                  value: item.quantity,
+                  image: product.images[0].imageURL,
+                },
+              ];
+            } else {
+              let flag = false;
+              productsArray.forEach((obj, index) => {
+                if (obj.name === product.name && !flag) {
+                  flag = true;
+                  obj.value = obj.value + item.quantity;
+                } else if (!flag && index === productsArray.length - 1) {
+                  flag = true;
+                  productsArray = [
+                    ...productsArray,
+                    {
+                      name: product.name,
+                      value: item.quantity,
+                      image: product.images[0].imageURL,
+                    },
+                  ];
+                }
+              });
+            }
+          }
+        }
+      }
+    }
+  }
+
+  const sortedProductsArray = productsArray.sort(
+    ({ value: a }, { value: b }) => b - a
+  );
+
+  const topSellingProducts = [];
+
+  for (let i = 0; i < 5; i++) {
+    topSellingProducts.push(sortedProductsArray[i]);
+  }
+
+  res.status(StatusCodes.OK).json({
+    ordersNumber: orders.length,
+    allOrdersTotal,
+    allOrdersTotalProducts,
+    salesBySubcategory,
+    topSellingProducts,
+    placedOrdersByDate,
+  });
+};
+
 module.exports = {
   getAllOrders,
   getSingleOrder,
-  updateOrderStatus,
   updateOrder,
+  getOrdersStats,
 };

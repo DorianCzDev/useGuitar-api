@@ -21,7 +21,7 @@ const {
 router
   .route("/")
   .post(authenticateUser, permission("admin"), upload.any(), createProduct)
-  .get(getAllProducts);
+  .get(authenticateUser, permission("admin"), getAllProducts);
 
 router
   .route("/deleteImage/:name")
@@ -29,7 +29,7 @@ router
 
 router
   .route("/:name")
-  .get(getSingleProduct)
+  .get(authenticateUser, permission("admin"), getSingleProduct)
   .patch(authenticateUser, permission("admin"), upload.any(), updateProduct)
   .delete(authenticateUser, permission("admin"), deleteProduct);
 
