@@ -27,12 +27,12 @@ const login = async (req, res) => {
 
   let refreshToken = "";
   const existingToken = await Token.findOne({ user: userId });
-  const tokenUser = { email, role, userId };
+  const tokenUser = { role, userId };
   if (existingToken) {
     refreshToken = existingToken.refreshToken;
     cookieResponse({ res, user: tokenUser, refreshToken });
     return res.status(StatusCodes.OK).json({
-      msg: "Login succesfull",
+      user: tokenUser,
     });
   }
   refreshToken = crypto.randomBytes(40).toString("hex");
