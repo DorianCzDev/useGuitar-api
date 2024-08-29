@@ -1,6 +1,6 @@
 const addCookieAccessHeaders = async (req, res, next) => {
   // Website you wish to allow to connect
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+  res.setHeader("Access-Control-Allow-Origin", process.env.FRONT_END_URL);
 
   // Request methods you wish to allow
   res.setHeader(
