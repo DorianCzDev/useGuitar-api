@@ -42,16 +42,8 @@ const deleteReviewFromReported = async (req, res) => {
   res.status(StatusCodes.OK).json({ review });
 };
 
-//temp
-const deleteAllReviews = async (req, res) => {
-  const reviews = await Review.deleteMany({});
-
-  res.status(StatusCodes.OK).json({ reviews });
-};
-
 module.exports = {
   getReportedReviews,
-  deleteAllReviews,
   deleteReportedReview,
   deleteReviewFromReported,
 };

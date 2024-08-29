@@ -2,7 +2,6 @@ const express = require("express");
 const {
   deleteReportedReview,
   getReportedReviews,
-  deleteAllReviews,
   deleteReviewFromReported,
 } = require("../controllers/reviewController");
 const {
@@ -13,8 +12,7 @@ const router = express.Router();
 
 router
   .route("/")
-  .get(authenticateUser, permission("admin"), getReportedReviews)
-  .delete(deleteAllReviews);
+  .get(authenticateUser, permission("admin"), getReportedReviews);
 router
   .route("/:id")
   .delete(authenticateUser, permission("admin"), deleteReportedReview)
