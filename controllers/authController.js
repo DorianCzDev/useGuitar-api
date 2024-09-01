@@ -14,7 +14,9 @@ const login = async (req, res) => {
   if (!user) {
     throw new CustomError.UnauthenticatedError("Invalid email or/and password");
   }
+
   const isPasswordCorrect = await user.comparePassword(password);
+
   if (!isPasswordCorrect) {
     throw new CustomError.UnauthenticatedError("Invalid email or/and password");
   }
@@ -49,6 +51,7 @@ const login = async (req, res) => {
 
 const logout = async (req, res) => {
   await Token.findOneAndDelete({ user: req.user.userId });
+
   res.cookie("accessToken", "logout", {
     httpOnly: true,
     expires: new Date(Date.now()),

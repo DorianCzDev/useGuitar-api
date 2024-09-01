@@ -72,6 +72,7 @@ const getAllProducts = async (req, res) => {
     "-description -updatedAt -user"
   );
 
+  //documents count is needed on the front-end to pagination
   const productsCount = await Product.countDocuments(queryObject);
 
   if (sortBy) {

@@ -204,6 +204,7 @@ ProductSchema.virtual("reviews", {
 });
 
 ProductSchema.pre("save", async function () {
+  // price is stored in database in cents because this is right way in stripe *stripe is supported on useGuitar*
   if (this.discount > 0) {
     this.price =
       this.noDiscountPrice - this.noDiscountPrice * (this.discount / 100);

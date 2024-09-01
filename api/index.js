@@ -1,6 +1,9 @@
 require("dotenv").config();
 require("express-async-errors");
 
+// at the beginning this project is also intended to be a backend for useGuitar react app
+// that's why some of the code doesn't fit much in some places but i decided to leave it for referance
+
 const express = require("express");
 const app = express();
 
@@ -24,7 +27,7 @@ app.use(express.json());
 app.use(cookieParser(process.env.JWT_SECRET));
 app.use(cors({ origin: true, credentials: true }));
 app.use(addCookieAccessHeaders);
-//routers
+
 const productRouter = require("../routes/productRoutes");
 const userRouter = require("../routes/userRoutes");
 const authRouter = require("../routes/authRoutes");
@@ -32,7 +35,6 @@ const reviewRouter = require("../routes/reviewRoutes");
 const orderRouter = require("../routes/orderRoutes");
 const deliveryRouter = require("../routes/deliveryRoutes");
 
-//error middlewares
 const notFoundMiddleware = require("../middleware/not-found");
 const errorHandlerMiddleware = require("../middleware/error-handler");
 

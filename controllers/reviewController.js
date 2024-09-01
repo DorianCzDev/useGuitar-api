@@ -5,6 +5,8 @@ const Review = require("../models/Review");
 const getReportedReviews = async (req, res) => {
   const { page } = req.query;
   let result = Review.find({ isReported: true });
+
+  //documents count is needed on the front-end to pagination
   const reviewsCount = await Review.countDocuments({ isReported: true });
 
   const limit = 4;

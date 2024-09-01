@@ -20,6 +20,8 @@ const getAllOrders = async (req, res) => {
   let result = Order.find(queryObject).select(
     "createdAt email firstName lastName total status"
   );
+
+  //documents count is needed on the front-end to pagination
   const ordersCount = await Order.countDocuments(queryObject);
 
   const limit = 10;
@@ -58,6 +60,8 @@ const updateOrder = async (req, res) => {
     country,
   } = req.body;
   let order = await Order.findOne({ _id: id });
+
+  //order can only updated if payment has been received by stripe *payments are supported by stripe on useGuitar*
   if (order.status === "waiting for payment" && status !== order.status) {
     throw new CustomError.UnauthorizedError("Payment not confirmed yet.");
   }
@@ -84,14 +88,14 @@ const updateOrder = async (req, res) => {
 };
 
 const getOrdersStats = async (req, res) => {
-  const d = new Date();
-  const pastYear = d.getFullYear() - 1;
-  d.setFullYear(pastYear);
-  d.setDate(1);
+  const date = new Date();
+  const pastYear = date.getFullYear() - 1;
+  date.setFullYear(pastYear);
+  date.setDate(1);
 
   const orders = await Order.find({
     status: ["send", "waiting for shipment"],
-    createdAt: { $gte: d },
+    createdAt: { $gte: date },
   });
 
   let dates = [];
@@ -115,6 +119,7 @@ const getOrdersStats = async (req, res) => {
     }
   );
 
+  // with current object structure in array can't correctly sort data
   const monthOrder = {
     Jan: 0,
     Feb: 1,
@@ -155,8 +160,8 @@ const getOrdersStats = async (req, res) => {
   let salesBySubcategory = [];
   let productsArray = [];
 
-  // I first tried to fetch every product separately but it took server 12 second
-  //and i decided to change my strategy to something that may be a little ugly, but effective
+  // I first tried to fetch every product separately but it took database 12 second to send every document
+  // and i decided to change my strategy to something that may be a little ugly, but effective
 
   // for (const order of orders) {
   //   for (const item of order.orderItems) {
@@ -246,6 +251,7 @@ const getOrdersStats = async (req, res) => {
 
   const topSellingProducts = [];
 
+  // loop to separete top 5 products
   for (let i = 0; i < 5; i++) {
     topSellingProducts.push(sortedProductsArray[i]);
   }
