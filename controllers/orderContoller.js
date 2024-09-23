@@ -160,7 +160,7 @@ const getOrdersStats = async (req, res) => {
   let salesBySubcategory = [];
   let productsArray = [];
 
-  // I first tried to fetch every product separately but it took database 12 second to send every document
+  // I first tried to fetch every product separately but it took database 12 second to send all documents
   // and i decided to change my strategy to something that may be a little ugly, but effective
 
   // for (const order of orders) {
