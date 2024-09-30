@@ -15,6 +15,7 @@ If you want to know more about a specific project, scroll ⬇️.
 - [DEMO](https://use-guitar.vercel.app/) [useGuitar](https://github.com/DorianCzDev/useGuitar) is full-stack next.js app where customer can order stuff
 - [DOCS](https://documenter.getpostman.com/view/33345435/2sAXqv4g9Y) [useGuitarApiNest](https://github.com/DorianCzDev/useGuitarApiNest) is back-end server based on NestJS with PostgreSQL database
 - [DEMO](https://use-guitar-panel-nest.vercel.app/) [useGuitarPanelNest](https://github.com/DorianCzDev/useGuitarPanelNest) is front-end react app for employees where they can add/remove/edit stuff with NestJS backend
+- [DEMO](https://use-guitar-nest.vercel.app/) [useGuitarNest](https://github.com/DorianCzDev/useGuitarNest) is front-end react app with NestJS backend where customer can order stuff
 
 ## `useGuitar-api` Tech Stack
 
